@@ -55,20 +55,20 @@ aej-microeconomics,AEJ: Microeconomics,2022,81,81,0,81,0,0,0,0,0
 aej-microeconomics,AEJ: Microeconomics,2023,66,66,0,66,0,0,0,0,0
 aej-microeconomics,AEJ: Microeconomics,2024,52,52,0,52,0,0,0,0,0
 aej-microeconomics,AEJ: Microeconomics,2025,48,48,0,48,0,0,0,0,0
-aer,AER,2012,264,263,1,263,0,0,0,0,0
-aer,AER,2013,246,245,1,245,0,0,0,0,0
-aer,AER,2014,149,148,1,148,0,0,0,0,0
-aer,AER,2015,113,112,1,112,0,0,0,0,0
-aer,AER,2016,115,114,1,114,0,0,0,0,0
-aer,AER,2017,114,113,1,113,0,0,0,0,0
-aer,AER,2018,105,104,1,104,0,0,0,0,0
-aer,AER,2019,121,120,1,120,0,0,0,0,0
-aer,AER,2020,113,112,1,112,0,0,0,0,0
-aer,AER,2021,112,111,1,111,0,0,0,0,0
-aer,AER,2022,115,114,1,113,1,0,0,0,0
-aer,AER,2023,92,91,1,91,0,0,0,0,0
+aer,AER,2012,263,263,0,263,0,0,0,0,0
+aer,AER,2013,245,245,0,245,0,0,0,0,0
+aer,AER,2014,148,148,0,148,0,0,0,0,0
+aer,AER,2015,112,112,0,112,0,0,0,0,0
+aer,AER,2016,114,114,0,114,0,0,0,0,0
+aer,AER,2017,113,113,0,113,0,0,0,0,0
+aer,AER,2018,104,104,0,104,0,0,0,0,0
+aer,AER,2019,120,120,0,120,0,0,0,0,0
+aer,AER,2020,112,112,0,112,0,0,0,0,0
+aer,AER,2021,111,111,0,111,0,0,0,0,0
+aer,AER,2022,114,114,0,113,1,0,0,0,0
+aer,AER,2023,91,91,0,91,0,0,0,0,0
 aer,AER,2024,111,111,0,111,0,0,0,0,0
-aer,AER,2025,120,119,1,119,0,0,0,0,0
+aer,AER,2025,119,119,0,119,0,0,0,0,0
 aer-insights,AER: Insights,2019,24,24,0,24,0,0,0,0,0
 aer-insights,AER: Insights,2020,32,32,0,32,0,0,0,0,0
 aer-insights,AER: Insights,2021,32,32,0,32,0,0,0,0,0
@@ -76,8 +76,8 @@ aer-insights,AER: Insights,2022,32,32,0,32,0,0,0,0,0
 aer-insights,AER: Insights,2023,34,34,0,34,0,0,0,0,0
 aer-insights,AER: Insights,2024,34,34,0,34,0,0,0,0,0
 aer-insights,AER: Insights,2025,32,32,0,32,0,0,0,0,0
-american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2012,99,96,3,0,0,95,1,0,0
-american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2013,117,113,4,0,0,113,0,0,0
+american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2012,96,96,0,0,0,95,1,0,0
+american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2013,113,113,0,0,0,113,0,0,0
 american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2014,85,85,0,0,0,85,0,0,0
 american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2015,81,81,0,0,0,81,0,0,0
 american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2016,81,81,0,0,81,0,0,0,0
@@ -314,23 +314,23 @@ journal-of-economic-growth,Journal of Economic Growth,2022,14,14,0,14,0,0,0,0,0
 journal-of-economic-growth,Journal of Economic Growth,2023,14,14,0,14,0,0,0,0,0
 journal-of-economic-growth,Journal of Economic Growth,2024,14,14,0,14,0,0,0,0,0
 journal-of-economic-growth,Journal of Economic Growth,2025,13,13,0,13,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2012,33,25,8,24,0,1,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2013,33,25,8,24,0,1,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2014,29,21,8,20,0,1,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2015,30,22,8,21,0,1,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2016,33,28,5,28,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2017,41,36,5,36,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2018,37,32,5,32,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2019,26,21,5,21,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2020,26,21,5,21,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2021,30,25,5,25,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2022,34,29,5,29,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2023,53,48,5,48,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2024,68,63,5,63,0,0,0,0,0
-journal-of-economic-literature,Journal of Economic Literature,2025,62,57,5,57,0,0,0,0,0
-journal-of-economic-perspectives,Journal of Economic Perspectives,2012,46,42,4,42,0,0,0,0,0
-journal-of-economic-perspectives,Journal of Economic Perspectives,2013,49,44,5,43,0,1,0,0,0
-journal-of-economic-perspectives,Journal of Economic Perspectives,2014,48,46,2,46,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2012,25,25,0,24,0,1,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2013,25,25,0,24,0,1,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2014,21,21,0,20,0,1,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2015,22,22,0,21,0,1,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2016,28,28,0,28,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2017,36,36,0,36,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2018,32,32,0,32,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2019,21,21,0,21,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2020,21,21,0,21,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2021,25,25,0,25,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2022,29,29,0,29,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2023,48,48,0,48,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2024,63,63,0,63,0,0,0,0,0
+journal-of-economic-literature,Journal of Economic Literature,2025,57,57,0,57,0,0,0,0,0
+journal-of-economic-perspectives,Journal of Economic Perspectives,2012,42,42,0,42,0,0,0,0,0
+journal-of-economic-perspectives,Journal of Economic Perspectives,2013,44,44,0,43,0,1,0,0,0
+journal-of-economic-perspectives,Journal of Economic Perspectives,2014,46,46,0,46,0,0,0,0,0
 journal-of-economic-perspectives,Journal of Economic Perspectives,2015,43,43,0,43,0,0,0,0,0
 journal-of-economic-perspectives,Journal of Economic Perspectives,2016,45,45,0,45,0,0,0,0,0
 journal-of-economic-perspectives,Journal of Economic Perspectives,2017,44,44,0,44,0,0,0,0,0
@@ -400,7 +400,7 @@ journal-of-health-economics,Journal of Health Economics,2024,68,68,0,0,68,0,0,0,
 journal-of-health-economics,Journal of Health Economics,2025,91,91,0,0,91,0,0,0,0
 journal-of-human-resources,Journal of Human Resources,2012,36,36,0,36,0,0,0,0,0
 journal-of-human-resources,Journal of Human Resources,2013,33,33,0,33,0,0,0,0,0
-journal-of-human-resources,Journal of Human Resources,2014,33,32,1,32,0,0,0,0,0
+journal-of-human-resources,Journal of Human Resources,2014,32,32,0,32,0,0,0,0,0
 journal-of-human-resources,Journal of Human Resources,2015,32,32,0,32,0,0,0,0,0
 journal-of-human-resources,Journal of Human Resources,2016,32,32,0,32,0,0,0,0,0
 journal-of-human-resources,Journal of Human Resources,2017,32,32,0,32,0,0,0,0,0
@@ -426,7 +426,7 @@ journal-of-international-economics,Journal of International Economics,2022,90,90
 journal-of-international-economics,Journal of International Economics,2023,100,100,0,0,100,0,0,0,0
 journal-of-international-economics,Journal of International Economics,2024,118,118,0,0,118,0,0,0,0
 journal-of-international-economics,Journal of International Economics,2025,117,117,0,0,117,0,0,0,0
-journal-of-labor-economics,Journal of Labor Economics,2012,25,24,1,24,0,0,0,0,0
+journal-of-labor-economics,Journal of Labor Economics,2012,24,24,0,24,0,0,0,0,0
 journal-of-labor-economics,Journal of Labor Economics,2013,30,30,0,30,0,0,0,0,0
 journal-of-labor-economics,Journal of Labor Economics,2014,26,26,0,26,0,0,0,0,0
 journal-of-labor-economics,Journal of Labor Economics,2015,37,37,0,37,0,0,0,0,0
@@ -468,7 +468,7 @@ journal-of-monetary-economics,Journal of Monetary Economics,2022,70,70,0,0,70,0,
 journal-of-monetary-economics,Journal of Monetary Economics,2023,67,67,0,0,67,0,0,0,0
 journal-of-monetary-economics,Journal of Monetary Economics,2024,95,95,0,0,95,0,0,0,0
 journal-of-monetary-economics,Journal of Monetary Economics,2025,88,88,0,0,88,0,0,0,0
-journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2012,83,82,1,82,0,0,0,0,0
+journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2012,82,82,0,82,0,0,0,0,0
 journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2013,81,81,0,81,0,0,0,0,0
 journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2014,82,82,0,82,0,0,0,0,0
 journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2015,80,80,0,80,0,0,0,0,0
