@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this catalog, please cite it as below."
+title: "Economics Journal Geographic Dispersion — article catalog, 2012–2025"
+type: dataset
+authors:
+  - family-names: "Yu"
+    given-names: "Chiuyu"
+    alias: "kochiuyu"
+    affiliation: "The Chinese University of Hong Kong"
+abstract: >
+  Public TOC-first article catalog for the Geographic Dispersion
+  core 49 economics journals, 2012–2025: titles, DOIs, issues,
+  research vs non-research typing, and author names as printed
+  in the publisher TOC or, when the TOC has no names, from
+  OpenAlex (name only). Internal person identifiers, conflict
+  files, and QS handoffs are not included.
+keywords:
+  - economics
+  - journals
+  - articles
+  - table of contents
+  - geographic dispersion
+license: CC-BY-4.0
+repository-code: "https://github.com/kochiuyu/econ-journal-authors"
+url: "https://kochiuyu.github.io/econ-journal-authors/"
+date-released: "2026-11-11"

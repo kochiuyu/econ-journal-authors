@@ -1,10 +1,10 @@
 # econ-journal-authors — Journal Articles (Geographic Dispersion)
 
-Public static site and future GitHub repo for the **Geographic Dispersion article catalog**:
+Public static site and GitHub repo for the **Geographic Dispersion article catalog**:
 the publisher tables of contents (TOC) for the core 49 economics journals, 2012–2025.
 
-- Planned repo: <https://github.com/kochiuyu/econ-journal-authors> (not created yet)
-- Planned site (GitHub Pages, project base `/econ-journal-authors/`): <https://kochiuyu.github.io/econ-journal-authors/>
+- Repo: <https://github.com/kochiuyu/econ-journal-authors>
+- Site (GitHub Pages, project base `/econ-journal-authors/`): <https://kochiuyu.github.io/econ-journal-authors/>
 - Sibling site, editorial boards: <https://kochiuyu.github.io/econ-journal-dispersion/>
   (repo <https://github.com/kochiuyu/econ-journal-dispersion>). No editor data is copied here.
 
@@ -70,9 +70,19 @@ The build fails if the freeze totals disagree with `summary.json` or if a person
 file or column would appear in `site/`. All asset paths are relative, so the same files work at the
 project-pages URL and on localhost. Data is fetched with `fetch()`, so open the site over HTTP, not `file://`.
 
-## Publishing (later)
+## Publishing
 
-Create an empty public repo `kochiuyu/econ-journal-authors`. Push this directory and serve
-GitHub Pages from `site/` (Actions) or publish `site/` to the `gh-pages` branch.
+GitHub Pages is served from the `gh-pages` branch, which is a subtree of `site/`. After a site rebuild:
 
-Licence: not yet chosen (the sibling editor project uses CC-BY-4.0). Titles and bylines remain the publishers’.
+```
+git add -A && git commit -m "…" && git push origin main
+git branch -D gh-pages
+git subtree split --prefix site -b gh-pages
+git push origin gh-pages
+```
+
+## License / citation
+
+The compiled catalog, site code, and documentation are **CC-BY-4.0**. See `LICENSE` and `CITATION.cff`.
+
+Article titles, author bylines, and publisher tables of contents remain the publishers’. OpenAlex names follow OpenAlex’s terms.

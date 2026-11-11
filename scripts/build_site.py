@@ -130,6 +130,7 @@ def page(title, description, active, body, canonical_path="", extra_head="", scr
       Repository: <a href="{ARTICLE_REPO}">kochiuyu/econ-journal-authors</a>.
       Sibling site: <a href="{EDITOR_SITE}">editor directory</a>
       (<a href="{EDITOR_REPO}">kochiuyu/econ-journal-dispersion</a>).
+      Compiled catalog, site, and documentation: <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a>.
       Titles and bylines remain the publishers’.
     </p>
   </footer>
@@ -163,6 +164,11 @@ ABOUT_HTML = """    <section class="prose" id="about" aria-labelledby="about-tit
       <p>
         Editorial boards for the same journals are in the sibling
         <a href="{editor_site}">editor directory</a>. This site does not copy any editor data.
+      </p>
+      <p>
+        The compiled catalog, site code, and documentation are licensed under
+        <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a>.
+        Article titles, author bylines, and publisher tables of contents remain the publishers’.
       </p>
       <p class="small">
         Built {built} (Asia/Taipei) from <code>releases/articles_toc_2012_2025/</code> with
