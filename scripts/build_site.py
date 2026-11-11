@@ -26,7 +26,8 @@ ARTICLE_SITE = "https://kochiuyu.github.io/econ-journal-authors/"
 ARTICLE_REPO = "https://github.com/kochiuyu/econ-journal-authors"
 
 TYPE_CODE = {"article": "a", "other": "o", "proceedings": "p"}
-SRC_CODE = {"spine": "s", "openalex_via_registry": "o", "openalex": "d", "": ""}
+SRC_CODE = {"spine": "s", "openalex_via_registry": "o", "openalex": "d", "crossref": "c",
+            "toc_official_qe": "q", "": ""}
 FORBIDDEN = ("person_id", "conflict", "qs_", "handoff", "spine_id")
 
 PUBLISHER_LABEL = {
@@ -60,7 +61,7 @@ def display_authors(raw: str, source: str, stats: Counter) -> str:
             return segs[0]
         stats["spine_as_stored"] += 1
         return raw
-    stats["openalex_as_stored"] += 1
+    stats[f"{source}_as_stored"] += 1
     return raw
 
 
@@ -148,7 +149,7 @@ ABOUT_HTML = """    <section class="prose" id="about" aria-labelledby="about-tit
       <p>
         Author names are shown as recorded, with their source. <strong>As printed in the TOC</strong> means the
         names come from the publisher’s TOC. <strong>OpenAlex (name only)</strong> means the TOC had no names and the
-        names come from OpenAlex names recorded by the collector. <strong>OpenAlex by DOI (name only)</strong> means neither the TOC nor that record had names, so the names come from the OpenAlex work for the item’s DOI. Both are names only, not linked identities. When neither source has names, none are shown.
+        names come from OpenAlex names recorded by the collector. <strong>OpenAlex by DOI (name only)</strong> means neither the TOC nor that record had names, so the names come from the OpenAlex work for the item’s DOI. <strong>Crossref by DOI (name only)</strong> means the names come from the Crossref record for the DOI. <strong>From the official article page</strong> means the names were read from the journal’s own article page (Quantitative Economics). All are names only, not linked identities. When neither source has names, none are shown.
         Names are not merged, cleaned, or completed. For TOC bylines stored as “A, B, and C” followed by each
         name, the printed byline is shown.
       </p>
@@ -253,7 +254,9 @@ def main() -> int:
                  "codes": {"type": {"a": "article", "o": "other", "p": "proceedings"},
                            "authors_source": {"s": "spine (as printed in TOC)",
                                               "o": "openalex_via_registry (name only)",
-                                              "d": "openalex by DOI (name only)", "": "none"}},
+                                              "d": "openalex by DOI (name only)",
+                                              "c": "crossref by DOI (name only)",
+                                              "q": "official article page (Quantitative Economics)", "": "none"}},
                  "issues": issues_by_j[slug], "items": items}
         out = SITE / "data" / "journals" / f"{slug}.json"
         out.write_text(json.dumps(shard, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
@@ -321,7 +324,7 @@ def main() -> int:
       The publisher tables of contents for 49 core economics journals,
       2012–2025. You can browse by journal, then by year and issue. Each item has its title, DOI, item type, and author names with their source.
       AER: Insights starts in 2019, so 2012–2018 have 48 journals.
-      This release has no person registry: names come from the TOC or from OpenAlex (name only).
+      This release has no person registry: names come from the TOC, the journal’s article pages, OpenAlex, or Crossref (names only).
     </p>
 
     <section class="stats" aria-label="Release totals">
@@ -332,7 +335,7 @@ def main() -> int:
       <div class="stat"><div class="n">{fmt(s["items_with_doi"])}</div><div class="l">Items with a DOI</div>
         <div class="sub">{fmt(s["items"] - s["items_with_doi"])} TOC records without one</div></div>
       <div class="stat"><div class="n">{fmt(s["research_with_authors"])}</div><div class="l">Research articles with names</div>
-        <div class="sub">{fmt(s["items_with_authors"])} items with names: {fmt(src["spine"])} from the TOC, {fmt(src.get("openalex_via_registry", 0) + src.get("openalex", 0))} from OpenAlex</div></div>
+        <div class="sub">{fmt(s["items_with_authors"])} items with names: {fmt(src.get("spine", 0) + src.get("toc_official_qe", 0))} from the publisher, {fmt(src.get("openalex_via_registry", 0) + src.get("openalex", 0))} from OpenAlex, {fmt(src.get("crossref", 0))} from Crossref</div></div>
     </section>
 
     <h2 class="section-title">Explore</h2>
@@ -385,7 +388,7 @@ def main() -> int:
         </fieldset>
         <button type="button" class="btn" id="f-reset">Reset filters</button>
       </div>
-      <p class="hint">Names are labelled by source. <em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex (name only)</em> and <em>OpenAlex by DOI</em> mean OpenAlex names, used when the TOC had none.
+      <p class="hint">Names are labelled by source. <em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex</em>, <em>OpenAlex by DOI</em>, and <em>Crossref by DOI</em> mean names from those databases, used when the TOC had none. <em>Official article page</em> means the journal’s own article page.
         Items without names show none. Only the selected journal is downloaded.</p>
     </form>
     <p class="count" id="count" role="status" aria-live="polite"></p>
