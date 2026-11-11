@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catalog — Journal Articles</title>
+  <meta name="description" content="Browse the core 49 TOC by journal, year, and issue.">
+  <link rel="canonical" href="https://kochiuyu.github.io/econ-journal-authors/catalog.html">
+  <meta property="og:title" content="Catalog — Journal Articles">
+  <meta property="og:description" content="Browse the core 49 TOC by journal, year, and issue.">
+  <meta property="og:type" content="website">
+  <!-- Project Pages base: /econ-journal-authors/. Asset URLs are relative so the
+       site also works under `python -m http.server` from site/. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23142833'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='15' fill='%23f4f1ea'%3EJa%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <div class="wrap bar">
+      <a class="brand" href="./">
+        <span class="logo" aria-hidden="true">Ja</span>
+        <span>
+          <span class="t1">Journal Articles</span>
+          <span class="t2">Geographic Dispersion · core 49, 2012–2025</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Site">
+        <a href="./">Home</a>
+        <a href="catalog.html" aria-current="page">Catalog</a>
+        <a href="index.html#journals">Journals</a>
+        <a href="index.html#about">About</a>
+        <a href="https://kochiuyu.github.io/econ-journal-dispersion/">Editors</a>
+        <a href="https://github.com/kochiuyu/econ-journal-authors#readme">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="main" tabindex="-1">
+    <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
+    <h1 class="page-title" id="results-title">Catalog</h1>
+    <form class="controls" role="search" aria-label="Browse the catalog" onsubmit="return false">
+      <div class="row">
+        <div class="field"><label class="lbl" for="f-journal">Journal</label>
+          <select id="f-journal"><option value="">Loading…</option></select></div>
+        <div class="field"><label class="lbl" for="f-year">Year</label>
+          <select id="f-year" disabled><option value="">All years</option></select></div>
+        <div class="field"><label class="lbl" for="f-issue">Issue</label>
+          <select id="f-issue" disabled><option value="">All issues</option></select></div>
+        <div class="field grow"><label class="lbl" for="f-q">Search titles and names in this journal</label>
+          <input type="search" id="f-q" autocomplete="off" placeholder="e.g. minimum wage, Duflo"></div>
+      </div>
+      <div class="row">
+        <fieldset class="chips" id="f-type">
+          <legend class="lbl">Item type</legend>
+          <button type="button" class="chip" data-type="research" aria-pressed="true">Research articles<span class="c"></span></button>
+          <button type="button" class="chip" data-type="other" aria-pressed="false">Other and proceedings<span class="c"></span></button>
+          <button type="button" class="chip" data-type="all" aria-pressed="false">All items<span class="c"></span></button>
+        </fieldset>
+        <button type="button" class="btn" id="f-reset">Reset filters</button>
+      </div>
+      <p class="hint">Names are labelled by source. <em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex (name only)</em> means OpenAlex names, used when the TOC had none.
+        Items without names show none. Only the selected journal is downloaded.</p>
+    </form>
+    <p class="count" id="count" role="status" aria-live="polite"></p>
+    <div id="results"></div>
+
+  </main>
+
+  <footer class="footer wrap">
+    <p>
+      Geographic Dispersion article catalog · TOC freeze <code>articles_toc_2012_2025</code>.
+      Repository: <a href="https://github.com/kochiuyu/econ-journal-authors">kochiuyu/econ-journal-authors</a>.
+      Sibling site: <a href="https://kochiuyu.github.io/econ-journal-dispersion/">editor directory</a>
+      (<a href="https://github.com/kochiuyu/econ-journal-dispersion">kochiuyu/econ-journal-dispersion</a>).
+      Titles and bylines remain the publishers’.
+    </p>
+  </footer>
+  <script src="catalog.js"></script>
+</body>
+</html>
