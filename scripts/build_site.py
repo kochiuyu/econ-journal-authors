@@ -22,8 +22,6 @@ FREEZE = ROOT / "releases" / "articles_toc_2012_2025"
 SRC = ROOT / "src"
 SITE = ROOT / "site"
 
-EDITOR_SITE = "https://kochiuyu.github.io/econ-journal-dispersion/"
-EDITOR_REPO = "https://github.com/kochiuyu/econ-journal-dispersion"
 ARTICLE_SITE = "https://kochiuyu.github.io/econ-journal-authors/"
 ARTICLE_REPO = "https://github.com/kochiuyu/econ-journal-authors"
 
@@ -83,7 +81,7 @@ def fmt(n) -> str:
 def page(title, description, active, body, canonical_path="", extra_head="", scripts=""):
     nav_items = [("./", "Home", "home"), ("catalog.html", "Catalog", "catalog"),
                  ("index.html#journals", "Journals", "journals"), ("index.html#about", "About", "about"),
-                 (EDITOR_SITE, "Editors", "editors"), (ARTICLE_REPO + "#readme", "GitHub", "github")]
+                 (ARTICLE_REPO + "#readme", "GitHub", "github")]
     nav = "\n        ".join(
         f'<a href="{esc(h)}"{" aria-current=\"page\"" if k == active else ""}>{esc(l)}</a>'
         for h, l, k in nav_items)
@@ -111,7 +109,7 @@ def page(title, description, active, body, canonical_path="", extra_head="", scr
         <span class="logo" aria-hidden="true">Ja</span>
         <span>
           <span class="t1">Journal Articles</span>
-          <span class="t2">Geographic Dispersion · core 49, 2012–2025</span>
+          <span class="t2">49 core economics journals · 2012–2025</span>
         </span>
       </a>
       <nav class="nav" aria-label="Site">
@@ -126,10 +124,8 @@ def page(title, description, active, body, canonical_path="", extra_head="", scr
 
   <footer class="footer wrap">
     <p>
-      Geographic Dispersion article catalog · TOC freeze <code>articles_toc_2012_2025</code>.
+      Article catalog · TOC freeze <code>articles_toc_2012_2025</code>.
       Repository: <a href="{ARTICLE_REPO}">kochiuyu/econ-journal-authors</a>.
-      Sibling site: <a href="{EDITOR_SITE}">editor directory</a>
-      (<a href="{EDITOR_REPO}">kochiuyu/econ-journal-dispersion</a>).
       Compiled catalog, site, and documentation: <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a>.
       Titles and bylines remain the publishers’.
     </p>
@@ -143,7 +139,7 @@ def page(title, description, active, body, canonical_path="", extra_head="", scr
 ABOUT_HTML = """    <section class="prose" id="about" aria-labelledby="about-title">
       <h2 id="about-title">About this release</h2>
       <p>
-        This is the first public release of the Geographic Dispersion article catalog: the publisher
+        This is the first public release of the article catalog: the publisher
         table of contents (TOC) for the core 49 economics journals, {window}. The TOC is the article list.
         Every item in an issue is kept. Research articles are marked <em>Research article</em>; front matter,
         editorials, comments, replies, and similar items are marked <em>Other</em>; conference papers are
@@ -160,10 +156,6 @@ ABOUT_HTML = """    <section class="prose" id="about" aria-labelledby="about-tit
         Not in this release: a person registry, author identifiers, affiliations, author pages, and any
         working files from the collection process. Affiliation panels and unique-author pages are planned
         for later releases. DOIs link to <code>doi.org</code>. When a TOC record has no DOI, the catalog says so.
-      </p>
-      <p>
-        Editorial boards for the same journals are in the sibling
-        <a href="{editor_site}">editor directory</a>. This site does not copy any editor data.
       </p>
       <p>
         The compiled catalog, site code, and documentation are licensed under
@@ -308,7 +300,7 @@ def main() -> int:
     (SITE / ".nojekyll").write_text("", encoding="utf-8")
 
     built = summary["created_at"][:10]
-    about = ABOUT_HTML.format(window=summary["window"].replace("-", "–"), editor_site=EDITOR_SITE,
+    about = ABOUT_HTML.format(window=summary["window"].replace("-", "–"),
                               built=built, repo=ARTICLE_REPO)
 
     # ---- Hub --------------------------------------------------------------
@@ -323,9 +315,9 @@ def main() -> int:
             f'<td class="num">{yrs}</td><td class="num">{fmt(j["years"])}</td><td class="num">{fmt(j["issues"])}</td>'
             f'<td class="num">{fmt(j["items"])}</td><td class="num">{fmt(j["research"])}</td>'
             f'<td class="num">{fmt(j["other"])}</td></tr>')
-    hub_body = f"""    <h1 class="sr-only">Journal Articles — Geographic Dispersion core 49, 2012–2025</h1>
+    hub_body = f"""    <h1 class="sr-only">Journal Articles — 49 core economics journals, 2012–2025</h1>
     <p class="intro">
-      The publisher tables of contents for the Geographic Dispersion core 49 economics journals,
+      The publisher tables of contents for 49 core economics journals,
       2012–2025. You can browse by journal, then by year and issue. Each item has its title, DOI, item type, and author names with their source.
       AER: Insights starts in 2019, so 2012–2018 have 48 journals.
       This release has no person registry: names come from the TOC or from OpenAlex (name only).
@@ -348,8 +340,6 @@ def main() -> int:
         <span class="sub">Choose a journal, then a year and an issue. You can search titles and names within the journal.</span></a>
       <a href="#journals"><span class="label">Journals</span>
         <span class="sub">All {s["journals"]} journals with years, issues, and research and other counts.</span></a>
-      <a href="{EDITOR_SITE}"><span class="label">Editor directory</span>
-        <span class="sub">Editorial boards are on the sibling site, econ-journal-dispersion.</span></a>
     </div>
 
     <h2 class="section-title" id="journals">Journals</h2>
@@ -367,7 +357,7 @@ def main() -> int:
 
 {about}"""
     (SITE / "index.html").write_text(
-        page("Journal Articles — Geographic Dispersion core 49, 2012–2025",
+        page("Journal Articles — 49 core economics journals, 2012–2025",
              "TOC-first article catalog for the core 49 economics journals, 2012–2025: titles, DOIs, item types, and author names by source.",
              "home", hub_body), encoding="utf-8")
 

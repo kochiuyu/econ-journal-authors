@@ -1,6 +1,6 @@
 # Articles TOC catalog, 2012–2025
 
-Public freeze of the Geographic Dispersion core-49 publisher table-of-contents spine.
+Public freeze of the core-49 publisher table-of-contents spine for 49 economics journals.
 
 - Window: 2012–2025 (AER Insights starts in 2019).
 - The TOC is the article list. `is_research=1` marks research articles (`article_type=article`); other items are kept and flagged.

@@ -1,12 +1,10 @@
-# econ-journal-authors — Journal Articles (Geographic Dispersion)
+# econ-journal-authors — Journal Articles
 
-Public static site and GitHub repo for the **Geographic Dispersion article catalog**:
-the publisher tables of contents (TOC) for the core 49 economics journals, 2012–2025.
+Public static site and GitHub repo for the **article catalog**:
+the publisher tables of contents (TOC) for 49 core economics journals, 2012–2025.
 
 - Repo: <https://github.com/kochiuyu/econ-journal-authors>
 - Site (GitHub Pages, project base `/econ-journal-authors/`): <https://kochiuyu.github.io/econ-journal-authors/>
-- Sibling site, editorial boards: <https://kochiuyu.github.io/econ-journal-dispersion/>
-  (repo <https://github.com/kochiuyu/econ-journal-dispersion>). No editor data is copied here.
 
 ## What the first release publishes
 
@@ -44,7 +42,7 @@ built 2026-11-11 (Asia/Taipei). Nothing is read from the collector workspace.
 
 ```
 scripts/build_site.py   reads the freeze, verifies it against summary.json, writes site/
-src/style.css           site stylesheet (sibling of the editor directory)
+src/style.css           site stylesheet
 src/catalog.js          browse UI
 site/                   generated; this is what GitHub Pages serves
   index.html            hub: counts, 49-journal table, About

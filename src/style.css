@@ -1,5 +1,4 @@
-/* Journal Articles — Geographic Dispersion article catalog.
-   Visual sibling of the editor directory (econ-journal-dispersion).
+/* Journal Articles catalog stylesheet.
    All asset paths are relative; the site lives under /econ-journal-authors/. */
 :root {
   --bg: #f3f0e8;
