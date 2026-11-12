@@ -8,23 +8,27 @@ the publisher tables of contents (TOC) for 49 core economics journals, 2012–20
 
 ## What the first release publishes
 
-You can browse by journal, then year, then issue. Each TOC item shows:
+You can search titles and author names across all 49 journals, or browse by journal, then year, then issue. Each TOC item shows:
 
 - title, pages, volume/issue, and a link to the issue TOC (and the publisher page when the freeze has one);
 - DOI linked to `https://doi.org/{doi}`, or “No DOI in the TOC record” (53 items);
 - type: **Research article** (`article_type=article`, `is_research=1`), **Other**, or **Proceedings** (`is_research=0`).
-  The catalog shows research articles first. A filter chip shows other/proceedings items or all items;
+  The catalog and site-wide search show research articles first. A filter chip includes other and proceedings items, or all items.
 - author names exactly as recorded, always labelled by source:
   - `authors_source=spine` → “as printed in the TOC”
   - `authors_source=openalex_via_registry` → “OpenAlex (name only)”
+  - `authors_source=openalex` → “OpenAlex by DOI (name only)”
+  - `authors_source=crossref` → “Crossref by DOI (name only)”
+  - `authors_source=toc_official_qe` → “official article page”
   - empty → no names shown; nothing is filled in from elsewhere.
 
 Spine rows stored as a printed byline followed by the individual names
 (`A, B, and C; A; B; C`) display the printed byline only. All other strings display verbatim.
 
 Freeze totals (from `summary.json`): 49 journals, 679 journal-years, 4,283 issues, 62,936 items,
-55,534 research articles, 7,402 other items, 62,883 with a DOI, 49,107 with author names
-(15,440 TOC, 33,667 OpenAlex), 47,674 research articles with names. AER: Insights starts in 2019.
+55,440 research articles, 7,496 other items, 62,883 with a DOI, 56,824 with author names
+(15,464 from the publisher, 41,238 from OpenAlex, 122 from Crossref), 55,439 research articles with names.
+AER: Insights starts in 2019.
 
 ## What is not published
 
@@ -43,19 +47,26 @@ built 2026-11-11 (Asia/Taipei). Nothing is read from the collector workspace.
 ```
 scripts/build_site.py   reads the freeze, verifies it against summary.json, writes site/
 src/style.css           site stylesheet
-src/catalog.js          browse UI
+src/catalog.js          browse UI and site-wide search
 site/                   generated; this is what GitHub Pages serves
-  index.html            hub: counts, 49-journal table, About
-  catalog.html          browse UI (?journal=&year=&volume=&issue=&type=&q=)
+  index.html            hub: search, counts, 49-journal table, About
+  catalog.html          search and browse (?journal=&year=&volume=&issue=&type=&q=&item=)
   data/journals.json    small index (meta + per-journal coverage)
   data/journals/<slug>.json   one lean shard per journal, loaded on demand
+  data/search/research.json   titles and display names for research articles
+  data/search/other.json      other and proceedings items, loaded when that filter is used
   downloads/            journal/issue/year tables + summary from the freeze
   404.html, .nojekyll
 ```
 
-Catalog URLs: `catalog.html?journal=aer`, `catalog.html?journal=aer&year=2018`,
-`catalog.html?journal=aer&year=2018&volume=108&issue=1`; optional `type=all|other` and `q=` (title/name search
-within the loaded journal).
+Catalog URLs:
+
+- `catalog.html?q=Duflo` searches titles and author names in all 49 journals (research articles unless `type=other` or `type=all`). No journal has to be selected first.
+- `catalog.html?journal=aer`, `catalog.html?journal=aer&year=2018`, `catalog.html?journal=aer&year=2018&volume=108&issue=1` browse as before.
+- `catalog.html?journal=aer&q=wage` still searches only inside the loaded journal.
+- `catalog.html?journal=aej-applied-economics&year=2015&volume=7&issue=1&item=2` opens that issue and highlights the item. `item` is the 0-based position in the issue’s TOC order, not a public identifier.
+
+The search index is built from the freeze only. It stores the same display names as the catalog, including the TOC byline-prefix rule, and it does not include `articles.csv`. The first site-wide search shows a loading state while `research.json` downloads; other and proceedings items download if you include them. GitHub Pages gzips those files.
 
 ## Build and preview
 
@@ -64,9 +75,10 @@ python3 scripts/build_site.py
 python3 -m http.server 8000 -d site     # then open http://localhost:8000/
 ```
 
-The build fails if the freeze totals disagree with `summary.json` or if a person_id, conflict, or QS
+The build fails if the freeze totals disagree with `summary.json`, if the search index does not match those totals, or if a person_id, conflict, or QS
 file or column would appear in `site/`. All asset paths are relative, so the same files work at the
 project-pages URL and on localhost. Data is fetched with `fetch()`, so open the site over HTTP, not `file://`.
+On a narrow screen the catalog keeps the search box, journal finder, and year and issue chips in reach, and each item has a Copy control for its DOI.
 
 ## Publishing
 

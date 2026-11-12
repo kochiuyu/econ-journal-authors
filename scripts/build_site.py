@@ -6,10 +6,13 @@ journals.csv, coverage.csv, summary.json, README.md).
 Output: site/ (static GitHub Pages site, relative asset paths only).
 
 No person_ids, conflict files, or QS handoffs are read or written.
+Also writes site/data/search/{research,other}.json, a title-and-author
+index for site-wide search. It uses the same display names as the shards.
 """
 from __future__ import annotations
 
 import csv
+import gzip
 import html
 import json
 import shutil
@@ -79,6 +82,93 @@ def fmt(n) -> str:
     return f"{int(n):,}"
 
 
+def public_readme(text: str) -> str:
+    """Drop editor-site wording from the public copy of the freeze README."""
+    kept = []
+    for line in text.splitlines(keepends=True):
+        if "econ-journal-dispersion" in line or "Geographic Dispersion" in line:
+            continue
+        kept.append(line)
+    return "".join(kept)
+
+
+def write_search_partition(path: Path, jindex, issues_by_j, rows):
+    """Compact title/author index. rows are (slug, issue_idx, n, type, src, title, authors)."""
+    slug_index = {j["slug"]: i for i, j in enumerate(jindex)}
+    used = {}
+    issues_out = []
+    items_out = []
+    for slug, issue_idx, n, typ, src, title, authors in rows:
+        key = (slug, issue_idx)
+        if key not in used:
+            meta = issues_by_j[slug][issue_idx]
+            used[key] = len(issues_out)
+            issues_out.append([slug_index[slug], meta[0], meta[1], meta[2]])
+        items_out.append([used[key], n, typ, src, title, authors])
+    obj = {
+        "fields": {
+            "issues": ["journal", "year", "volume", "issue"],
+            "items": ["issue", "n", "type", "authors_source", "title", "authors"],
+        },
+        "codes": {
+            "type": {"a": "article", "o": "other", "p": "proceedings"},
+            "authors_source": {
+                "s": "spine (as printed in TOC)",
+                "o": "openalex_via_registry (name only)",
+                "d": "openalex by DOI (name only)",
+                "c": "crossref by DOI (name only)",
+                "q": "official article page (Quantitative Economics)",
+                "": "none",
+            },
+        },
+        "journals": [j["slug"] for j in jindex],
+        "issues": issues_out,
+        "items": items_out,
+    }
+    raw = json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(raw)
+    return raw, obj
+
+
+def check_search(research_obj, other_obj, summary):
+    """Fail the build if the index drifts from the freeze or rewrites a known byline."""
+    r_items = research_obj["items"]
+    o_items = other_obj["items"]
+    problems = []
+    if len(r_items) != summary["research_articles"]:
+        problems.append(f"research items {len(r_items)} != {summary['research_articles']}")
+    if len(o_items) != summary["other_items"]:
+        problems.append(f"other items {len(o_items)} != {summary['other_items']}")
+    if any(it[2] != "a" for it in r_items):
+        problems.append("research index contains a non-research row")
+    if any(it[2] == "a" for it in o_items):
+        problems.append("other index contains a research row")
+    title = "The Short- and Long-Term Career Effects of Graduating in a Recession"
+    hits = [it for it in r_items if it[4] == title]
+    if len(hits) != 1:
+        problems.append(f"known title hits {len(hits)}")
+    else:
+        iss = research_obj["issues"][hits[0][0]]
+        slug = research_obj["journals"][iss[0]]
+        if (slug, iss[1], iss[2], iss[3], hits[0][1]) != ("aej-applied-economics", "2012", "4", "1", 1):
+            problems.append(f"known title location {(slug, iss[1], iss[2], iss[3], hits[0][1])}")
+        if ";" in hits[0][5] or "Philip Oreopoulos" not in hits[0][5]:
+            problems.append("TOC byline prefix was not applied to the known title")
+    micro = "The Miracle of Microfinance? Evidence from a Randomized Evaluation"
+    duflo = [it for it in r_items if it[4] == micro and "Duflo" in (it[5] or "")]
+    if len(duflo) != 1:
+        problems.append(f"Duflo microfinance hits {len(duflo)}")
+    else:
+        iss = research_obj["issues"][duflo[0][0]]
+        slug = research_obj["journals"][iss[0]]
+        if (slug, iss[1], iss[2], iss[3], duflo[0][1]) != ("aej-applied-economics", "2015", "7", "1", 2):
+            problems.append(f"Duflo location {(slug, iss[1], iss[2], iss[3], duflo[0][1])}")
+        if ";" in duflo[0][5]:
+            problems.append("Duflo byline was not shortened to the printed byline")
+    return problems
+
+
 def page(title, description, active, body, canonical_path="", extra_head="", scripts=""):
     nav_items = [("./", "Home", "home"), ("catalog.html", "Catalog", "catalog"),
                  ("index.html#journals", "Journals", "journals"), ("index.html#about", "About", "about"),
@@ -100,7 +190,7 @@ def page(title, description, active, body, canonical_path="", extra_head="", scr
   <!-- Project Pages base: /econ-journal-authors/. Asset URLs are relative so the
        site also works under `python -m http.server` from site/. -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23142833'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='15' fill='%23f4f1ea'%3EJa%3C/text%3E%3C/svg%3E">
-  {extra_head or '<link rel="stylesheet" href="style.css">'}
+  {extra_head or '<link rel="stylesheet" href="style.css?v=3">'}
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -169,6 +259,7 @@ ABOUT_HTML = """    <section class="prose" id="about" aria-labelledby="about-tit
         (<a href="downloads/journals.csv">journals.csv</a>, <a href="downloads/issues.csv">issues.csv</a>,
         <a href="downloads/coverage.csv">coverage.csv</a>, <a href="downloads/authors_missing_by_journal_year.csv">authors_missing_by_journal_year.csv</a>, <a href="downloads/summary.json">summary.json</a>).
         The repository is <a href="{repo}">kochiuyu/econ-journal-authors</a>.
+        Searching all journals uses <code>data/search/</code>, a title-and-author index built from the same freeze, not the raw article table.
       </p>
     </section>
 """
@@ -240,6 +331,7 @@ def main() -> int:
         ])
 
     jindex = []
+    search_rows = []
     shard_sizes = {}
     names = {j["journal_slug"]: j["display_name"] for j in journals}
     for j in sorted(journals, key=lambda x: x["display_name"].lower()):
@@ -247,6 +339,12 @@ def main() -> int:
         items = items_by_j.get(slug, [])
         # Keep issue grouping stable even if articles.csv interleaves issues.
         items.sort(key=lambda it: it[0])
+        seq = Counter()
+        for it in items:
+            n = seq[it[0]]
+            seq[it[0]] += 1
+            # Same strings the shard displays: title, authors, source, type, TOC position.
+            search_rows.append((slug, it[0], n, it[4], it[6], it[1], it[5]))
         shard = {"slug": slug, "name": names[slug],
                  "fields": {"issues": ["year", "volume", "issue", "toc_url", "items", "research", "other"],
                             "items": ["issue_idx", "title", "doi", "pages", "type", "authors", "authors_source",
@@ -278,9 +376,33 @@ def main() -> int:
         json.dumps({"meta": meta, "journals": jindex}, ensure_ascii=False, separators=(",", ":")),
         encoding="utf-8")
 
+    # ---- Site-wide search index (titles + display names only) -----------
+    research_raw, research_obj = write_search_partition(
+        SITE / "data" / "search" / "research.json", jindex, issues_by_j,
+        [r for r in search_rows if r[3] == "a"])
+    other_raw, other_obj = write_search_partition(
+        SITE / "data" / "search" / "other.json", jindex, issues_by_j,
+        [r for r in search_rows if r[3] != "a"])
+    search_problems = check_search(research_obj, other_obj, summary)
+    if search_problems:
+        print("Search index check failed:", search_problems, file=sys.stderr)
+        return 1
+    for blob, label in ((research_raw, "research"), (other_raw, "other")):
+        if b"person_id" in blob or b"spine_id" in blob:
+            print(f"Search index {label} contains a forbidden identifier", file=sys.stderr)
+            return 1
+    search_sizes = {
+        "research": (len(research_raw), len(gzip.compress(research_raw, 9))),
+        "other": (len(other_raw), len(gzip.compress(other_raw, 9))),
+    }
+
     # ---- Downloads (journal-level tables only) ---------------------------
     for name in ("journals.csv", "issues.csv", "coverage.csv", "authors_missing_by_journal_year.csv", "summary.json", "README.md"):
-        shutil.copy2(FREEZE / name, SITE / "downloads" / name)
+        dest = SITE / "downloads" / name
+        if name == "README.md":
+            dest.write_text(public_readme((FREEZE / name).read_text(encoding="utf-8")), encoding="utf-8")
+        else:
+            shutil.copy2(FREEZE / name, dest)
     dl_rows = "\n".join(f'      <li><a href="{n}">{n}</a></li>' for n in
                         ("journals.csv", "issues.csv", "coverage.csv", "authors_missing_by_journal_year.csv", "summary.json", "README.md"))
     (SITE / "downloads" / "index.html").write_text(
@@ -294,7 +416,7 @@ def main() -> int:
 {dl_rows}
     </ul>
     <p><a href="../">Back to the hub</a></p>
-    </section>""").replace('href="style.css"', 'href="../style.css"').replace('href="./"', 'href="../"')
+    </section>""").replace('href="style.css?v=3"', 'href="../style.css?v=3"').replace('href="./"', 'href="../"')
         .replace('href="catalog.html"', 'href="../catalog.html"').replace('href="index.html#', 'href="../index.html#'),
         encoding="utf-8")
 
@@ -314,15 +436,16 @@ def main() -> int:
     for j in jindex:
         yrs = f'{j["year_start"]}–{j["year_end"]}'
         rows.append(
-            f'          <tr><td><a class="jname" href="catalog.html?journal={esc(j["slug"])}">{esc(j["name"])}</a></td>'
-            f'<td>{esc(PUBLISHER_LABEL.get(j["publisher"], j["publisher"]))}</td>'
-            f'<td class="num">{yrs}</td><td class="num">{fmt(j["years"])}</td><td class="num">{fmt(j["issues"])}</td>'
-            f'<td class="num">{fmt(j["items"])}</td><td class="num">{fmt(j["research"])}</td>'
-            f'<td class="num">{fmt(j["other"])}</td></tr>')
+            f'          <tr><td data-label="Journal"><a class="jname" href="catalog.html?journal={esc(j["slug"])}">{esc(j["name"])}</a></td>'
+            f'<td class="num" data-label="Publisher">{esc(PUBLISHER_LABEL.get(j["publisher"], j["publisher"]))}</td>'
+            f'<td class="num" data-label="Years">{yrs}</td><td class="num" data-label="Journal-years">{fmt(j["years"])}</td>'
+            f'<td class="num" data-label="Issues">{fmt(j["issues"])}</td><td class="num" data-label="Items">{fmt(j["items"])}</td>'
+            f'<td class="num" data-label="Research">{fmt(j["research"])}</td>'
+            f'<td class="num" data-label="Other">{fmt(j["other"])}</td></tr>')
     hub_body = f"""    <h1 class="sr-only">Journal Articles — 49 core economics journals, 2012–2025</h1>
     <p class="intro">
       The publisher tables of contents for 49 core economics journals,
-      2012–2025. You can browse by journal, then by year and issue. Each item has its title, DOI, item type, and author names with their source.
+      2012–2025. Search titles and author names across every journal, or browse by journal, then by year and issue. Each item has its title, DOI, item type, and author names with their source.
       AER: Insights starts in 2019, so 2012–2018 have 48 journals.
       This release has no person registry: names come from the TOC, the journal’s article pages, OpenAlex, or Crossref (names only).
     </p>
@@ -338,17 +461,27 @@ def main() -> int:
         <div class="sub">{fmt(s["items_with_authors"])} items with names: {fmt(src.get("spine", 0) + src.get("toc_official_qe", 0))} from the publisher, {fmt(src.get("openalex_via_registry", 0) + src.get("openalex", 0))} from OpenAlex, {fmt(src.get("crossref", 0))} from Crossref</div></div>
     </section>
 
+    <h2 class="section-title" id="search">Search</h2>
+    <form class="site-search" action="catalog.html" method="get" role="search">
+      <label class="lbl" for="home-q">Titles and author names, all {s["journals"]} journals</label>
+      <div class="site-search-row">
+        <input id="home-q" type="search" name="q" enterkeyhint="search" autocomplete="off" placeholder="e.g. minimum wage, Duflo">
+        <button class="btn primary" type="submit">Search</button>
+      </div>
+      <p class="hint">Research articles are included by default. In the catalog, choose “Other and proceedings” or “All items” to widen a search. A result opens that issue.</p>
+    </form>
+
     <h2 class="section-title">Explore</h2>
     <div class="explore">
       <a href="catalog.html"><span class="label">Catalog</span>
-        <span class="sub">Choose a journal, then a year and an issue. You can search titles and names within the journal.</span></a>
+        <span class="sub">Search all journals, or choose a journal, then a year and an issue.</span></a>
       <a href="#journals"><span class="label">Journals</span>
-        <span class="sub">All {s["journals"]} journals with years, issues, and research and other counts.</span></a>
+        <span class="sub">All {s["journals"]} journals with years, issues, and research and item counts.</span></a>
     </div>
 
     <h2 class="section-title" id="journals">Journals</h2>
     <div class="tbl-wrap">
-      <table>
+      <table class="responsive">
         <caption>{s["journals"]} journals. Counts are TOC items in the {s["window"].replace("-", "–")} freeze. A journal name opens its catalog.</caption>
         <thead><tr><th scope="col">Journal</th><th scope="col">Publisher</th><th scope="col" class="num">Years</th>
           <th scope="col" class="num">Journal-years</th><th scope="col" class="num">Issues</th><th scope="col" class="num">Items</th>
@@ -362,22 +495,32 @@ def main() -> int:
 {about}"""
     (SITE / "index.html").write_text(
         page("Journal Articles — 49 core economics journals, 2012–2025",
-             "TOC-first article catalog for the core 49 economics journals, 2012–2025: titles, DOIs, item types, and author names by source.",
+             "Search and browse the core 49 economics journals, 2012–2025: titles, DOIs, item types, and author names by source.",
              "home", hub_body), encoding="utf-8")
 
     # ---- Catalog ----------------------------------------------------------
     cat_body = """    <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
     <h1 class="page-title" id="results-title">Catalog</h1>
-    <form class="controls" role="search" aria-label="Browse the catalog" onsubmit="return false">
+    <form class="controls" role="search" aria-label="Search and browse the catalog" onsubmit="return false">
       <div class="row">
-        <div class="field"><label class="lbl" for="f-journal">Journal</label>
-          <select id="f-journal"><option value="">Loading…</option></select></div>
-        <div class="field"><label class="lbl" for="f-year">Year</label>
-          <select id="f-year" disabled><option value="">All years</option></select></div>
-        <div class="field"><label class="lbl" for="f-issue">Issue</label>
-          <select id="f-issue" disabled><option value="">All issues</option></select></div>
-        <div class="field grow"><label class="lbl" for="f-q">Search titles and names in this journal</label>
-          <input type="search" id="f-q" autocomplete="off" placeholder="e.g. minimum wage, Duflo"></div>
+        <div class="field grow"><label class="lbl" id="f-q-label" for="f-q">Search titles and authors in all journals</label>
+          <input type="search" id="f-q" autocomplete="off" enterkeyhint="search" placeholder="e.g. minimum wage, Duflo"></div>
+      </div>
+      <div class="row">
+        <div class="field journal-field"><label class="lbl" for="f-journal">Journal</label>
+          <div class="combo">
+            <input type="search" id="f-journal" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="f-journal-list" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Find a journal…">
+            <ul id="f-journal-list" class="combo-list" role="listbox" hidden></ul>
+          </div>
+        </div>
+      </div>
+      <div class="row picks-row" id="year-row" hidden>
+        <div class="field"><span class="lbl" id="year-lbl">Year</span>
+          <div id="f-year" class="picks" role="group" aria-labelledby="year-lbl"></div></div>
+      </div>
+      <div class="row picks-row" id="issue-row" hidden>
+        <div class="field"><span class="lbl" id="issue-lbl">Issue</span>
+          <div id="f-issue" class="picks" role="group" aria-labelledby="issue-lbl"></div></div>
       </div>
       <div class="row">
         <fieldset class="chips" id="f-type">
@@ -387,17 +530,22 @@ def main() -> int:
           <button type="button" class="chip" data-type="all" aria-pressed="false">All items<span class="c"></span></button>
         </fieldset>
         <button type="button" class="btn" id="f-reset">Reset filters</button>
+        <button type="button" class="btn" id="f-all" hidden>Search all journals</button>
       </div>
-      <p class="hint">Names are labelled by source. <em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex</em>, <em>OpenAlex by DOI</em>, and <em>Crossref by DOI</em> mean names from those databases, used when the TOC had none. <em>Official article page</em> means the journal’s own article page.
-        Items without names show none. Only the selected journal is downloaded.</p>
+      <p class="hint">Search all journals, or choose one to browse by year and issue. Research articles are the default. A result opens the issue and highlights the item.</p>
+      <details class="hint">
+        <summary>How author names are labelled</summary>
+        <p><em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex</em>, <em>OpenAlex by DOI</em>, and <em>Crossref by DOI</em> mean names from those databases, used when the TOC had none. <em>Official article page</em> means the journal’s own article page. Items without names show none. Copy a DOI from the item.</p>
+      </details>
     </form>
     <p class="count" id="count" role="status" aria-live="polite"></p>
     <div id="results"></div>
 """
     (SITE / "catalog.html").write_text(
         page("Catalog — Journal Articles",
-             "Browse the core 49 TOC by journal, year, and issue.", "catalog", cat_body,
-             canonical_path="catalog.html", scripts='  <script src="catalog.js"></script>'),
+             "Search titles and author names across 49 economics journals, or browse by journal, year, and issue.",
+             "catalog", cat_body,
+             canonical_path="catalog.html", scripts='  <script src="catalog.js?v=3"></script>'),
         encoding="utf-8")
 
     # ---- 404 (inline CSS so it styles at any depth) -----------------------
@@ -428,10 +576,19 @@ def main() -> int:
             low_name = p.name.lower()
             if any(f in low_name for f in FORBIDDEN):
                 leaks.append(str(p))
+            if p.name == "articles.csv":
+                leaks.append(f"{p}: articles.csv")
+            rel = p.relative_to(SITE).as_posix()
+            if p.suffix.lower() in (".html", ".js", ".css", ".md") and not rel.startswith("data/"):
+                prose = p.read_text(encoding="utf-8")
+                if "econ-journal-dispersion" in prose or "Geographic Dispersion" in prose:
+                    leaks.append(f"{rel}: editor-site or Geographic Dispersion wording")
             if p.suffix in (".json", ".csv"):
                 head = p.read_text(encoding="utf-8")
                 if "person_id" in head and p.name != "summary.json":
                     leaks.append(f"{p}: person_id")
+                if rel.startswith("data/search/") and "spine_id" in head:
+                    leaks.append(f"{p}: spine_id")
     csv_cols = set()
     for n in ("journals.csv", "issues.csv", "coverage.csv", "authors_missing_by_journal_year.csv"):
         with open(SITE / "downloads" / n, newline="", encoding="utf-8") as f:
@@ -443,9 +600,15 @@ def main() -> int:
 
     total = sum(shard_sizes.values())
     big = max(shard_sizes, key=shard_sizes.get)
+    search_raw = sum(s[0] for s in search_sizes.values())
+    if search_raw >= total or search_sizes["research"][1] > 3_500_000:
+        print("Search index is not clearly smaller than the journal shards", search_sizes, total, file=sys.stderr)
+        return 1
     print(f"Built {SITE}")
     print(f"  {len(jindex)} journals, {len(issues)} issues, {len(articles)} items")
     print(f"  shards: {total/1e6:.1f} MB total; largest {big} {shard_sizes[big]/1e6:.2f} MB")
+    print(f"  search: research {search_sizes['research'][0]/1e6:.2f} MB (gzip {search_sizes['research'][1]/1e6:.2f} MB); "
+          f"other {search_sizes['other'][0]/1e6:.2f} MB (gzip {search_sizes['other'][1]/1e6:.2f} MB)")
     print(f"  authors display: {dict(stats)}")
     return 0
 

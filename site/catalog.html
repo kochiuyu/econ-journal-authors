@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Catalog — Journal Articles</title>
-  <meta name="description" content="Browse the core 49 TOC by journal, year, and issue.">
+  <meta name="description" content="Search titles and author names across 49 economics journals, or browse by journal, year, and issue.">
   <link rel="canonical" href="https://kochiuyu.github.io/econ-journal-authors/catalog.html">
   <meta property="og:title" content="Catalog — Journal Articles">
-  <meta property="og:description" content="Browse the core 49 TOC by journal, year, and issue.">
+  <meta property="og:description" content="Search titles and author names across 49 economics journals, or browse by journal, year, and issue.">
   <meta property="og:type" content="website">
   <!-- Project Pages base: /econ-journal-authors/. Asset URLs are relative so the
        site also works under `python -m http.server` from site/. -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23142833'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='15' fill='%23f4f1ea'%3EJa%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -38,16 +38,26 @@
   <main class="wrap" id="main" tabindex="-1">
     <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
     <h1 class="page-title" id="results-title">Catalog</h1>
-    <form class="controls" role="search" aria-label="Browse the catalog" onsubmit="return false">
+    <form class="controls" role="search" aria-label="Search and browse the catalog" onsubmit="return false">
       <div class="row">
-        <div class="field"><label class="lbl" for="f-journal">Journal</label>
-          <select id="f-journal"><option value="">Loading…</option></select></div>
-        <div class="field"><label class="lbl" for="f-year">Year</label>
-          <select id="f-year" disabled><option value="">All years</option></select></div>
-        <div class="field"><label class="lbl" for="f-issue">Issue</label>
-          <select id="f-issue" disabled><option value="">All issues</option></select></div>
-        <div class="field grow"><label class="lbl" for="f-q">Search titles and names in this journal</label>
-          <input type="search" id="f-q" autocomplete="off" placeholder="e.g. minimum wage, Duflo"></div>
+        <div class="field grow"><label class="lbl" id="f-q-label" for="f-q">Search titles and authors in all journals</label>
+          <input type="search" id="f-q" autocomplete="off" enterkeyhint="search" placeholder="e.g. minimum wage, Duflo"></div>
+      </div>
+      <div class="row">
+        <div class="field journal-field"><label class="lbl" for="f-journal">Journal</label>
+          <div class="combo">
+            <input type="search" id="f-journal" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="f-journal-list" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Find a journal…">
+            <ul id="f-journal-list" class="combo-list" role="listbox" hidden></ul>
+          </div>
+        </div>
+      </div>
+      <div class="row picks-row" id="year-row" hidden>
+        <div class="field"><span class="lbl" id="year-lbl">Year</span>
+          <div id="f-year" class="picks" role="group" aria-labelledby="year-lbl"></div></div>
+      </div>
+      <div class="row picks-row" id="issue-row" hidden>
+        <div class="field"><span class="lbl" id="issue-lbl">Issue</span>
+          <div id="f-issue" class="picks" role="group" aria-labelledby="issue-lbl"></div></div>
       </div>
       <div class="row">
         <fieldset class="chips" id="f-type">
@@ -57,9 +67,13 @@
           <button type="button" class="chip" data-type="all" aria-pressed="false">All items<span class="c"></span></button>
         </fieldset>
         <button type="button" class="btn" id="f-reset">Reset filters</button>
+        <button type="button" class="btn" id="f-all" hidden>Search all journals</button>
       </div>
-      <p class="hint">Names are labelled by source. <em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex</em>, <em>OpenAlex by DOI</em>, and <em>Crossref by DOI</em> mean names from those databases, used when the TOC had none. <em>Official article page</em> means the journal’s own article page.
-        Items without names show none. Only the selected journal is downloaded.</p>
+      <p class="hint">Search all journals, or choose one to browse by year and issue. Research articles are the default. A result opens the issue and highlights the item.</p>
+      <details class="hint">
+        <summary>How author names are labelled</summary>
+        <p><em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex</em>, <em>OpenAlex by DOI</em>, and <em>Crossref by DOI</em> mean names from those databases, used when the TOC had none. <em>Official article page</em> means the journal’s own article page. Items without names show none. Copy a DOI from the item.</p>
+      </details>
     </form>
     <p class="count" id="count" role="status" aria-live="polite"></p>
     <div id="results"></div>
@@ -74,6 +88,6 @@
       Titles and bylines remain the publishers’.
     </p>
   </footer>
-  <script src="catalog.js"></script>
+  <script src="catalog.js?v=3"></script>
 </body>
 </html>
