@@ -190,7 +190,7 @@ def page(title, description, active, body, canonical_path="", extra_head="", scr
   <!-- Project Pages base: /econ-journal-authors/. Asset URLs are relative so the
        site also works under `python -m http.server` from site/. -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23142833'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='15' fill='%23f4f1ea'%3EJa%3C/text%3E%3C/svg%3E">
-  {extra_head or '<link rel="stylesheet" href="style.css?v=3">'}
+  {extra_head or '<link rel="stylesheet" href="style.css?v=5">'}
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -416,7 +416,7 @@ def main() -> int:
 {dl_rows}
     </ul>
     <p><a href="../">Back to the hub</a></p>
-    </section>""").replace('href="style.css?v=3"', 'href="../style.css?v=3"').replace('href="./"', 'href="../"')
+    </section>""").replace('href="style.css?v=5"', 'href="../style.css?v=5"').replace('href="./"', 'href="../"')
         .replace('href="catalog.html"', 'href="../catalog.html"').replace('href="index.html#', 'href="../index.html#'),
         encoding="utf-8")
 
@@ -532,10 +532,10 @@ def main() -> int:
         <button type="button" class="btn" id="f-reset">Reset filters</button>
         <button type="button" class="btn" id="f-all" hidden>Search all journals</button>
       </div>
-      <p class="hint">Search all journals, or choose one to browse by year and issue. Research articles are the default. A result opens the issue and highlights the item.</p>
+      <p class="hint">Search all journals, or choose one to browse by year and issue. Research articles are the default. A result opens the issue and highlights the item. On an issue, Previous and Next move to the adjacent issue. Cite copies a plain-text citation and a BibTeX entry.</p>
       <details class="hint">
         <summary>How author names are labelled</summary>
-        <p><em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex</em>, <em>OpenAlex by DOI</em>, and <em>Crossref by DOI</em> mean names from those databases, used when the TOC had none. <em>Official article page</em> means the journal’s own article page. Items without names show none. Copy a DOI from the item.</p>
+        <p><em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex</em>, <em>OpenAlex by DOI</em>, and <em>Crossref by DOI</em> mean names from those databases, used when the TOC had none. <em>Official article page</em> means the journal’s own article page. Items without names show none. Copy a DOI from the item. Cite uses the names, title, journal, year, volume, issue, pages, and DOI shown on that item.</p>
       </details>
     </form>
     <p class="count" id="count" role="status" aria-live="polite"></p>
@@ -545,7 +545,7 @@ def main() -> int:
         page("Catalog — Journal Articles",
              "Search titles and author names across 49 economics journals, or browse by journal, year, and issue.",
              "catalog", cat_body,
-             canonical_path="catalog.html", scripts='  <script src="catalog.js?v=3"></script>'),
+             canonical_path="catalog.html", scripts='  <script src="catalog.js?v=5"></script>'),
         encoding="utf-8")
 
     # ---- 404 (inline CSS so it styles at any depth) -----------------------

@@ -25,6 +25,16 @@ You can search titles and author names across all 49 journals, or browse by jour
 Spine rows stored as a printed byline followed by the individual names
 (`A, B, and C; A; B; C`) display the printed byline only. All other strings display verbatim.
 
+On an issue, **Previous** and **Next** open the adjacent issue of that journal in catalog order
+(year, then volume, then issue, so numeric issues such as 1, 2, … 10 come before labels such as S1;
+Elsevier continuous volumes stay issue “C”). The step crosses a year or volume when that is the next
+catalog issue. The first and last issue in the 2012–2025 window has the empty direction disabled.
+The move updates `year`, `volume`, and `issue` only. A highlighted `item` does not carry over.
+
+Each TOC item has **Cite**. It copies a plain-text journal citation and a BibTeX `@article` record
+from the displayed author names (the same string as on the page, including the byline-prefix rule),
+title, journal, year, volume, issue, pages, and DOI. Empty fields are omitted. Names are not rewritten.
+
 Freeze totals (from `summary.json`): 49 journals, 679 journal-years, 4,283 issues, 62,936 items,
 55,440 research articles, 7,496 other items, 62,883 with a DOI, 56,824 with author names
 (15,464 from the publisher, 41,238 from OpenAlex, 122 from Crossref), 55,439 research articles with names.
@@ -65,6 +75,7 @@ Catalog URLs:
 - `catalog.html?journal=aer`, `catalog.html?journal=aer&year=2018`, `catalog.html?journal=aer&year=2018&volume=108&issue=1` browse as before.
 - `catalog.html?journal=aer&q=wage` still searches only inside the loaded journal.
 - `catalog.html?journal=aej-applied-economics&year=2015&volume=7&issue=1&item=2` opens that issue and highlights the item. `item` is the 0-based position in the issue’s TOC order, not a public identifier.
+- Previous and Next on that issue go to the neighboring issues in the same order the year page lists them. No extra query parameter is added.
 
 The search index is built from the freeze only. It stores the same display names as the catalog, including the TOC byline-prefix rule, and it does not include `articles.csv`. The first site-wide search shows a loading state while `research.json` downloads; other and proceedings items download if you include them. GitHub Pages gzips those files.
 
@@ -78,7 +89,7 @@ python3 -m http.server 8000 -d site     # then open http://localhost:8000/
 The build fails if the freeze totals disagree with `summary.json`, if the search index does not match those totals, or if a person_id, conflict, or QS
 file or column would appear in `site/`. All asset paths are relative, so the same files work at the
 project-pages URL and on localhost. Data is fetched with `fetch()`, so open the site over HTTP, not `file://`.
-On a narrow screen the catalog keeps the search box, journal finder, and year and issue chips in reach, and each item has a Copy control for its DOI.
+On a narrow screen the catalog keeps the search box, journal finder, and year and issue chips in reach. Previous and Next are full-width tap targets, and each item keeps Copy DOI beside Cite.
 
 ## Publishing
 
