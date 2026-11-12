@@ -11,7 +11,7 @@ the publisher tables of contents (TOC) for 49 core economics journals, 2012–20
 You can search titles and author names across all 49 journals, or browse by journal, then year, then issue. Each TOC item shows:
 
 - title, pages, volume/issue, and a link to the issue TOC (and the publisher page when the freeze has one);
-- DOI linked to `https://doi.org/{doi}`, or “No DOI in the TOC record” (53 items);
+- DOI linked to `https://doi.org/{doi}` (every item in this freeze has a DOI);
 - type: **Research article** (`article_type=article`, `is_research=1`), **Other**, or **Proceedings** (`is_research=0`).
   The catalog and site-wide search show research articles first. A filter chip includes other and proceedings items, or all items.
 - author names exactly as recorded, always labelled by source:
@@ -36,7 +36,7 @@ from the displayed author names (the same string as on the page, including the b
 title, journal, year, volume, issue, pages, and DOI. Empty fields are omitted. Names are not rewritten.
 
 Freeze totals (from `summary.json`): 49 journals, 679 journal-years, 4,283 issues, 62,936 items,
-55,440 research articles, 7,496 other items, 62,883 with a DOI, 56,824 with author names
+55,440 research articles, 7,496 other items, 62,936 with a DOI, 56,824 with author names
 (15,464 from the publisher, 41,238 from OpenAlex, 122 from Crossref), 55,439 research articles with names.
 AER: Insights starts in 2019.
 
@@ -50,7 +50,7 @@ author pages are planned for later releases.
 
 The only input is the frozen release `releases/articles_toc_2012_2025/`
 (`articles.csv`, `issues.csv`, `journals.csv`, `coverage.csv`, `summary.json`, `README.md`),
-built 2026-11-11 (Asia/Taipei). Nothing is read from the collector workspace.
+built 2026-11-12 13:37 (Asia/Taipei). This supersedes the 2026-11-11 23:59 freeze. Nothing is read from the collector workspace.
 
 ## Layout
 
