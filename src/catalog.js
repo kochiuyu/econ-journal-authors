@@ -5,7 +5,11 @@
    data/search/other.json. Those files store the same display names
    as the shards (including the TOC byline-prefix rule).
    An issue link may include item=<n>, the 0-based position of the
-   item within that issue's TOC order, used only to highlight it. */
+   item within that issue's TOC order, used only to highlight it.
+   On an issue, Previous and Next follow shard.issues order
+   (year, volume, issue as sorted at build time), including across
+   a year or volume. Cite copies a plain-text citation and BibTeX
+   from the fields already on the item. */
 (function () {
   "use strict";
 
@@ -51,6 +55,7 @@
   var combo = { open: false, active: -1, matches: [] };
   var limit = SEARCH_PAGE;
   var state = readState();
+  var scrollToIssue = false;
   limit = pageSize();
 
   function readState() {
@@ -115,6 +120,156 @@
 
   function issueLabel(vol, iss) {
     return "Vol. " + vol + ", Issue " + iss;
+  }
+
+  function trimField(s) {
+    return s == null ? "" : String(s).trim();
+  }
+
+  function doiBare(doi) {
+    return trimField(doi).replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "");
+  }
+
+  function bibEscape(s) {
+    return String(s)
+      .replace(/\\/g, "\u0000")
+      .replace(/([#$%&_{}])/g, "\\$1")
+      .replace(/~/g, "\\textasciitilde{}")
+      .replace(/\^/g, "\\textasciicircum{}")
+      .replace(/\u0000/g, "\\textbackslash{}");
+  }
+
+  function citeKey(doi, slug, year, volume, issue, n) {
+    var raw = doiBare(doi);
+    var base = raw ? raw : [slug, year, volume, issue, "n" + n].join("-");
+    base = base.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+    return base || "article";
+  }
+
+  function plainCitation(o) {
+    var authors = trimField(o.authors);
+    var year = trimField(o.year);
+    var title = trimField(o.title);
+    var journal = trimField(o.journal);
+    var volume = trimField(o.volume);
+    var issue = trimField(o.issue);
+    var pages = trimField(o.pages);
+    var doi = doiBare(o.doi);
+    var chunks = [];
+    if (authors) chunks.push(/[.!?]$/.test(authors) ? authors : authors + ".");
+    if (year) chunks.push(year + ".");
+    if (title) {
+      var end = ".";
+      if (/[!?]$/.test(title)) {
+        end = title.slice(-1);
+        title = title.slice(0, -1).trim();
+      } else {
+        title = title.replace(/\.+$/, "").trim();
+      }
+      chunks.push("\u201c" + title + end + "\u201d");
+    }
+    var loc = journal;
+    var vi = "";
+    if (volume && issue) vi = volume + "(" + issue + ")";
+    else if (volume) vi = volume;
+    else if (issue) vi = "no. " + issue;
+    if (vi) loc = loc ? (loc + " " + vi) : vi;
+    if (pages) loc = loc ? (loc + ": " + pages) : pages;
+    if (loc) {
+      if (!/[.!?]$/.test(loc)) loc += ".";
+      chunks.push(loc);
+    }
+    if (doi) chunks.push("https://doi.org/" + doi);
+    return chunks.join(" ");
+  }
+
+  function bibtexCitation(o) {
+    var doi = doiBare(o.doi);
+    var fields = [
+      ["author", trimField(o.authors)],
+      ["title", trimField(o.title)],
+      ["journal", trimField(o.journal)],
+      ["year", trimField(o.year)],
+      ["volume", trimField(o.volume)],
+      ["number", trimField(o.issue)],
+      ["pages", trimField(o.pages)],
+      ["doi", doi]
+    ];
+    var lines = [];
+    fields.forEach(function (pair) {
+      if (!pair[1]) return;
+      lines.push("  " + pair[0] + " = {" + bibEscape(pair[1]) + "}");
+    });
+    return "@article{" + o.key + ",\n" + lines.join(",\n") + "\n}";
+  }
+
+  function currentIssueIndex(shard) {
+    if (!state.issue) return -1;
+    for (var i = 0; i < shard.issues.length; i++) {
+      var row = shard.issues[i];
+      if (row[0] === state.year && row[1] === state.volume && row[2] === state.issue) return i;
+    }
+    return -1;
+  }
+
+  function issueStep(dir, iss, journal) {
+    var forward = dir === "next";
+    var dest = iss
+      ? iss[0] + " \u00b7 " + issueLabel(iss[1], iss[2])
+      : (forward ? "No later issue" : "No earlier issue");
+    var label = (forward ? "Next issue, " : "Previous issue, ") + dest;
+    var kids = [
+      el("span", { class: "step-dir", text: forward ? "Next issue" : "Previous issue" }),
+      el("span", { class: "step-dest", text: dest })
+    ];
+    if (!iss) {
+      return el("button", {
+        type: "button",
+        class: "issue-step" + (forward ? " next" : ""),
+        disabled: true,
+        "aria-label": label
+      }, kids);
+    }
+    return el("a", {
+      class: "issue-step" + (forward ? " next" : ""),
+      href: buildQuery({
+        journal: journal, year: iss[0], volume: iss[1], issue: iss[2],
+        type: state.type, q: state.q
+      }),
+      "aria-label": label
+    }, kids);
+  }
+
+  function issueNav(shard, idx, place) {
+    var prev = idx > 0 ? shard.issues[idx - 1] : null;
+    var next = idx + 1 < shard.issues.length ? shard.issues[idx + 1] : null;
+    return el("nav", {
+      class: "issue-nav " + place,
+      "aria-label": place === "end" ? "Adjacent issues, end of issue" : "Adjacent issues"
+    }, [
+      issueStep("prev", prev, shard.slug),
+      issueStep("next", next, shard.slug)
+    ]);
+  }
+
+  function goToIssue(href) {
+    var nextUrl = new URL(href, location.href);
+    var p = nextUrl.searchParams;
+    state.year = p.get("year") || "";
+    state.volume = p.get("volume") || "";
+    state.issue = p.get("issue") || "";
+    state.item = "";
+    scrollToIssue = true;
+    commit(true);
+  }
+
+  function finishIssueScroll() {
+    if (!scrollToIssue) return;
+    scrollToIssue = false;
+    var title = document.getElementById("results-title");
+    if (!title || !title.scrollIntoView) return;
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    title.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
   }
 
   function typeFor(itemType) {
@@ -415,29 +570,80 @@
     return el("div", { class: "authors" }, kids);
   }
 
-  function doiLine(doi) {
-    if (!doi) return el("span", { text: "No DOI in the TOC record" });
-    return el("span", { class: "doi-line" }, [
-      "DOI ",
-      el("a", { class: "doi", href: "https://doi.org/" + doi, rel: "noopener", text: doi }),
-      el("button", {
+  function doiLine(doi, citeBtn) {
+    var kids = [];
+    if (doi) {
+      kids.push("DOI ");
+      kids.push(el("a", { class: "doi", href: "https://doi.org/" + doi, rel: "noopener", text: doi }));
+    } else {
+      kids.push(el("span", { text: "No DOI in the TOC record" }));
+    }
+    var actions = [];
+    if (doi) {
+      actions.push(el("button", {
         type: "button",
         class: "copy-doi",
         "data-doi": doi,
         "aria-label": "Copy DOI " + doi,
         text: "Copy DOI"
-      })
+      }));
+    }
+    if (citeBtn) actions.push(citeBtn);
+    if (actions.length) kids.push(el("span", { class: "item-actions" }, actions));
+    return el("span", { class: "doi-line" }, kids);
+  }
+
+  function citeField(label, text, copyLabel) {
+    return el("div", { class: "cite-field" }, [
+      el("div", { class: "cite-field-head" }, [
+        el("span", { class: "cite-label", text: label }),
+        el("button", {
+          type: "button",
+          class: "copy-cite",
+          "data-label": copyLabel,
+          "aria-label": copyLabel,
+          text: copyLabel
+        })
+      ]),
+      el("pre", { class: "cite-block", text: text })
     ]);
+  }
+
+  function citeControl(info) {
+    var plain = plainCitation(info);
+    var bib = bibtexCitation(info);
+    var id = "cite-" + info.slug + "-" + info.issueIdx + "-" + info.n;
+    var btn = el("button", {
+      type: "button",
+      class: "cite-btn",
+      id: id + "-btn",
+      "aria-expanded": "false",
+      "aria-controls": id,
+      text: "Cite"
+    });
+    var panel = el("div", {
+      class: "cite-panel",
+      id: id,
+      role: "region",
+      "aria-labelledby": id + "-btn",
+      hidden: true
+    }, [
+      citeField("Citation", plain, "Copy citation"),
+      citeField("BibTeX", bib, "Copy BibTeX"),
+      el("p", { class: "cite-status", role: "status", "aria-live": "polite" }),
+      el("p", { class: "cite-note", text: "Copied as shown: author names, title, journal, year, volume, issue, pages, and DOI. Empty fields are left out." })
+    ]);
+    return { button: btn, panel: panel };
   }
 
   function renderItem(it, shard, showWhere) {
     var title = it[1], doi = it[2], pages = it[3], t = it[4], authors = it[5], src = it[6], pub = it[7];
     var n = it._n;
+    var iss = shard.issues[it[0]];
     var target = !!(state.item !== "" && state.issue && String(n) === String(state.item));
     var kids = [];
     if (target) kids.push(el("span", { class: "sr-only", text: "Highlighted item." }));
     if (showWhere) {
-      var iss = shard.issues[it[0]];
       var href = buildQuery({
         journal: shard.slug, year: iss[0], volume: iss[1], issue: iss[2],
         type: typeFor(t), q: "", item: String(n)
@@ -451,11 +657,26 @@
       title || "(No title in the TOC record)"
     ]));
     kids.push(authorLine(authors, src));
+    var cite = citeControl({
+      authors: authors,
+      title: title,
+      journal: shard.name || "",
+      year: iss[0],
+      volume: iss[1],
+      issue: iss[2],
+      pages: pages,
+      doi: doi,
+      slug: shard.slug,
+      issueIdx: it[0],
+      n: n,
+      key: citeKey(doi, shard.slug, iss[0], iss[1], iss[2], n)
+    });
     var meta = [];
     if (pages) meta.push(el("span", { text: "Pages " + pages }));
-    meta.push(doiLine(doi));
+    meta.push(doiLine(doi, cite.button));
     if (pub) meta.push(el("a", { href: pub, rel: "noopener", text: "Publisher page" }));
     kids.push(el("div", { class: "meta" }, meta));
+    kids.push(cite.panel);
     return el("li", {
       class: "item" + (target ? " target" : ""),
       id: "item-" + it[0] + "-" + n,
@@ -545,9 +766,12 @@
     }
 
     els.count.textContent = fmt(hits.length) + " " + typeWord + (terms.length ? " matching “" + queryText() + "”" : "") + " in this view.";
+    var issueIdx = currentIssueIndex(shard);
     if (!hits.length) {
+      if (issueIdx >= 0) els.results.appendChild(issueNav(shard, issueIdx, "solo"));
       els.results.appendChild(el("p", { class: "empty", text: counts.all ? "No items of this type here. Try “All items”." : "No items match." }));
       focusTarget();
+      finishIssueScroll();
       return;
     }
     var shown = hits.slice(0, limit);
@@ -576,7 +800,11 @@
             el("a", { href: iss[3], rel: "noopener", text: "Issue TOC" })
           ])
         ]);
-        els.results.appendChild(el("section", { class: "issue" }, [head, ol2]));
+        var sectionKids = [head];
+        if (issueIdx >= 0 && g.k === issueIdx) sectionKids.push(issueNav(shard, issueIdx, "start"));
+        sectionKids.push(ol2);
+        if (issueIdx >= 0 && g.k === issueIdx) sectionKids.push(issueNav(shard, issueIdx, "end"));
+        els.results.appendChild(el("section", { class: "issue" }, sectionKids));
       });
     }
     if (hits.length > limit) {
@@ -585,6 +813,7 @@
       els.results.appendChild(el("div", { class: "pager" }, [more]));
     }
     focusTarget();
+    finishIssueScroll();
   }
 
   function natPieces(s) {
@@ -804,7 +1033,8 @@
         }
       }, 1600);
     }, function () {
-      var link = b.parentNode && b.parentNode.querySelector("a.doi");
+      var line = b.closest && b.closest(".doi-line");
+      var link = line && line.querySelector("a.doi");
       if (link) {
         var sel = window.getSelection();
         var range = document.createRange();
@@ -822,8 +1052,84 @@
     if (e.type === "click") e.preventDefault();
     startCopy(b);
   }
-  els.results.addEventListener("pointerdown", copyFromEvent);
-  els.results.addEventListener("click", copyFromEvent);
+  function closeCite(b) {
+    b.setAttribute("aria-expanded", "false");
+    var panel = document.getElementById(b.getAttribute("aria-controls"));
+    if (panel) panel.setAttribute("hidden", "");
+  }
+  function toggleCite(b) {
+    var open = b.getAttribute("aria-expanded") === "true";
+    var others = els.results.querySelectorAll(".cite-btn[aria-expanded='true']");
+    for (var i = 0; i < others.length; i++) if (others[i] !== b) closeCite(others[i]);
+    if (open) { closeCite(b); return; }
+    b.setAttribute("aria-expanded", "true");
+    var panel = document.getElementById(b.getAttribute("aria-controls"));
+    if (panel) panel.removeAttribute("hidden");
+  }
+  function startCiteCopy(b) {
+    if (!b || b.getAttribute("data-state") === "busy" || b.getAttribute("data-state") === "copied") return;
+    var field = b.closest && b.closest(".cite-field");
+    var pre = field && field.querySelector(".cite-block");
+    var text = pre ? pre.textContent : "";
+    if (!text) return;
+    var idle = b.getAttribute("data-label") || "Copy";
+    var panel = b.closest(".cite-panel");
+    var status = panel && panel.querySelector(".cite-status");
+    function setStatus(msg) { if (status) status.textContent = msg; }
+    b.setAttribute("data-state", "busy");
+    b.textContent = "Copying\u2026";
+    setStatus("Copying\u2026");
+    copyText(text).then(function () {
+      var done = idle === "Copy BibTeX" ? "BibTeX copied." : "Citation copied.";
+      b.textContent = "Copied";
+      b.setAttribute("data-state", "copied");
+      b.setAttribute("aria-label", done);
+      setStatus(done);
+      setTimeout(function () {
+        if (b.getAttribute("data-state") === "copied") {
+          b.textContent = idle;
+          b.removeAttribute("data-state");
+          b.setAttribute("aria-label", idle);
+        }
+      }, 1600);
+    }, function () {
+      if (pre) {
+        var sel = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      b.textContent = "Selected";
+      b.setAttribute("data-state", "selected");
+      setStatus("Could not copy. The text is selected.");
+    });
+  }
+  function citeFromEvent(e) {
+    var copyBtn = e.target.closest && e.target.closest(".copy-cite");
+    if (copyBtn) {
+      if (e.type === "click") e.preventDefault();
+      startCiteCopy(copyBtn);
+      return;
+    }
+    if (e.type !== "click") return;
+    var citeBtn = e.target.closest && e.target.closest(".cite-btn");
+    if (citeBtn) { toggleCite(citeBtn); return; }
+    var step = e.target.closest && e.target.closest("a.issue-step");
+    if (!step) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    goToIssue(step.getAttribute("href"));
+  }
+  els.results.addEventListener("pointerdown", function (e) {
+    copyFromEvent(e);
+    var copyBtn = e.target.closest && e.target.closest(".copy-cite");
+    if (copyBtn) startCiteCopy(copyBtn);
+  });
+  els.results.addEventListener("click", function (e) {
+    copyFromEvent(e);
+    citeFromEvent(e);
+  });
 
   els.journal.addEventListener("focus", function () {
     combo.open = true;
