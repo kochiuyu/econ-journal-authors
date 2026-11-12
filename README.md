@@ -20,6 +20,7 @@ You can search titles and author names across all 49 journals, or browse by jour
   - `authors_source=openalex` → “OpenAlex by DOI (name only)”
   - `authors_source=crossref` → “Crossref by DOI (name only)”
   - `authors_source=toc_official_qe` → “official article page”
+  - `authors_source=publisher_page` → “official article page”
   - empty → no names shown; nothing is filled in from elsewhere.
 
 Spine rows stored as a printed byline followed by the individual names
@@ -36,8 +37,8 @@ from the displayed author names (the same string as on the page, including the b
 title, journal, year, volume, issue, pages, and DOI. Empty fields are omitted. Names are not rewritten.
 
 Freeze totals (from `summary.json`): 49 journals, 679 journal-years, 4,283 issues, 62,936 items,
-55,440 research articles, 7,496 other items, 62,936 with a DOI, 56,824 with author names
-(15,464 from the publisher, 41,238 from OpenAlex, 122 from Crossref), 55,439 research articles with names.
+55,440 research articles, 7,496 other items, 62,936 with a DOI, 56,825 with author names
+(15,465 from the publisher, 41,238 from OpenAlex, 122 from Crossref), 55,440 research articles with names.
 AER: Insights starts in 2019.
 
 ## What is not published
@@ -50,7 +51,7 @@ author pages are planned for later releases.
 
 The only input is the frozen release `releases/articles_toc_2012_2025/`
 (`articles.csv`, `issues.csv`, `journals.csv`, `coverage.csv`, `summary.json`, `README.md`),
-built 2026-11-12 13:37 (Asia/Taipei). This supersedes the 2026-11-11 23:59 freeze. Nothing is read from the collector workspace.
+built 2026-11-12 13:55 (Asia/Taipei). This supersedes the 2026-11-12 13:37 freeze. Nothing is read from the collector workspace.
 
 ## Layout
 

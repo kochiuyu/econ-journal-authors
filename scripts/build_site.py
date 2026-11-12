@@ -32,7 +32,7 @@ ARTICLE_REPO = "https://github.com/kochiuyu/econ-journal-authors"
 
 TYPE_CODE = {"article": "a", "other": "o", "proceedings": "p"}
 SRC_CODE = {"spine": "s", "openalex_via_registry": "o", "openalex": "d", "crossref": "c",
-            "toc_official_qe": "q", "": ""}
+            "toc_official_qe": "q", "publisher_page": "p", "": ""}
 FORBIDDEN = ("person_id", "conflict", "qs_", "handoff", "spine_id")
 
 PUBLISHER_LABEL = {
@@ -119,7 +119,8 @@ def write_search_partition(path: Path, jindex, issues_by_j, rows):
                 "o": "openalex_via_registry (name only)",
                 "d": "openalex by DOI (name only)",
                 "c": "crossref by DOI (name only)",
-                "q": "official article page (Quantitative Economics)",
+                "q": "official article page",
+                "p": "official article page",
                 "": "none",
             },
         },
@@ -306,7 +307,7 @@ ABOUT_HTML = """    <section class="prose" id="about" aria-labelledby="about-tit
       <p>
         Author names are shown as recorded, with their source. <strong>As printed in the TOC</strong> means the
         names come from the publisher’s TOC. <strong>OpenAlex (name only)</strong> means the TOC had no names and the
-        names come from OpenAlex names recorded by the collector. <strong>OpenAlex by DOI (name only)</strong> means neither the TOC nor that record had names, so the names come from the OpenAlex work for the item’s DOI. <strong>Crossref by DOI (name only)</strong> means the names come from the Crossref record for the DOI. <strong>From the official article page</strong> means the names were read from the journal’s own article page (Quantitative Economics). All are names only, not linked identities. When neither source has names, none are shown.
+        names come from OpenAlex names recorded by the collector. <strong>OpenAlex by DOI (name only)</strong> means neither the TOC nor that record had names, so the names come from the OpenAlex work for the item’s DOI. <strong>Crossref by DOI (name only)</strong> means the names come from the Crossref record for the DOI. <strong>From the official article page</strong> means the names were read from the journal’s own article page. All are names only, not linked identities. When neither source has names, none are shown.
         Names are not merged, cleaned, or completed. For TOC bylines stored as “A, B, and C” followed by each
         name, the printed byline is shown.
         In an issue list, each name is a link labeled “Search for this name.” It searches the catalog for that
@@ -429,7 +430,7 @@ def main() -> int:
                                               "o": "openalex_via_registry (name only)",
                                               "d": "openalex by DOI (name only)",
                                               "c": "crossref by DOI (name only)",
-                                              "q": "official article page (Quantitative Economics)", "": "none"}},
+                                              "q": "official article page", "p": "official article page", "": "none"}},
                  "issues": issues_by_j[slug], "items": items}
         out = SITE / "data" / "journals" / f"{slug}.json"
         out.write_text(json.dumps(shard, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
@@ -553,7 +554,7 @@ def main() -> int:
       <div class="stat"><div class="n">{fmt(s["items_with_doi"])}</div><div class="l">Items with a DOI</div>
         <div class="sub">{"Every item has a DOI" if s["items"] == s["items_with_doi"] else fmt(s["items"] - s["items_with_doi"]) + " TOC records without one"}</div></div>
       <div class="stat"><div class="n">{fmt(s["research_with_authors"])}</div><div class="l">Research articles with names</div>
-        <div class="sub">{fmt(s["items_with_authors"])} items with names: {fmt(src.get("spine", 0) + src.get("toc_official_qe", 0))} from the publisher, {fmt(src.get("openalex_via_registry", 0) + src.get("openalex", 0))} from OpenAlex, {fmt(src.get("crossref", 0))} from Crossref</div></div>
+        <div class="sub">{fmt(s["items_with_authors"])} items with names: {fmt(src.get("spine", 0) + src.get("toc_official_qe", 0) + src.get("publisher_page", 0))} from the publisher, {fmt(src.get("openalex_via_registry", 0) + src.get("openalex", 0))} from OpenAlex, {fmt(src.get("crossref", 0))} from Crossref</div></div>
     </section>
 
     <h2 class="section-title">Explore</h2>

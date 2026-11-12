@@ -22,13 +22,14 @@
   var TYPE_LABEL = { a: "Research article", o: "Other", p: "Proceedings" };
   var TYPE_CLASS = { a: "t-article", o: "t-other", p: "t-proceedings" };
   var SRC_LABEL = { s: "as printed in the TOC", o: "OpenAlex (name only)", d: "OpenAlex by DOI (name only)",
-    c: "Crossref by DOI (name only)", q: "official article page" };
+    c: "Crossref by DOI (name only)", q: "official article page", p: "official article page" };
   var SRC_TITLE = {
     s: "Author names as printed in the publisher table of contents.",
     o: "Author names from OpenAlex, recorded as names only. Not a person registry.",
     d: "Author names from the OpenAlex work for this DOI, names only. Not a person registry.",
     c: "Author names from the Crossref record for this DOI, names only. Not a person registry.",
-    q: "Author names from the journal's official article page."
+    q: "Author names from the journal's official article page.",
+    p: "Author names from the journal's official article page."
   };
   var PAGE = 250;
   var SEARCH_PAGE = 40;
