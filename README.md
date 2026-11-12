@@ -65,19 +65,23 @@ site/                   generated; this is what GitHub Pages serves
   data/journals/<slug>.json   one lean shard per journal, loaded on demand
   data/search/research.json   titles and display names for research articles
   data/search/other.json      other and proceedings items, loaded when that filter is used
+  data/search/doi.json        DOI to issue and item position, loaded only for a DOI query
   downloads/            journal/issue/year tables + summary from the freeze
   404.html, .nojekyll
 ```
 
 Catalog URLs:
 
+- The homepage search box submits to `catalog.html?q=…`. The same box is on the catalog page, and the query stays in the URL.
 - `catalog.html?q=Duflo` searches titles and author names in all 49 journals (research articles unless `type=other` or `type=all`). No journal has to be selected first.
 - `catalog.html?journal=aer`, `catalog.html?journal=aer&year=2018`, `catalog.html?journal=aer&year=2018&volume=108&issue=1` browse as before.
 - `catalog.html?journal=aer&q=wage` still searches only inside the loaded journal.
 - `catalog.html?journal=aej-applied-economics&year=2015&volume=7&issue=1&item=2` opens that issue and highlights the item. `item` is the 0-based position in the issue’s TOC order, not a public identifier.
 - Previous and Next on that issue go to the neighboring issues in the same order the year page lists them. No extra query parameter is added.
+- On an issue, each displayed author name is a link labeled “Search for this name.” It opens a site-wide search for that name string only. The same display name is not one person, and there is no author page.
+- A DOI in either search box — `10.…`, `https://doi.org/…`, or `http://dx.doi.org/…`, with case and surrounding whitespace ignored — opens that issue and highlights the item when the DOI is in this catalog. If it is not, the catalog says the DOI is not in the 2012–2025 release and does not add a record.
 
-The search index is built from the freeze only. It stores the same display names as the catalog, including the TOC byline-prefix rule, and it does not include `articles.csv`. The first site-wide search shows a loading state while `research.json` downloads; other and proceedings items download if you include them. GitHub Pages gzips those files.
+The search index is built from the freeze only. It stores the same display names as the catalog, including the TOC byline-prefix rule, and it does not include `articles.csv`. The first site-wide search shows a loading state while `research.json` downloads; other and proceedings items download if you include them. DOI lookup uses `data/search/doi.json` (lowercased DOI, journal, year, volume, issue, and TOC position only) and loads that file only when the query is a DOI. GitHub Pages gzips those files.
 
 ## Build and preview
 
@@ -89,7 +93,7 @@ python3 -m http.server 8000 -d site     # then open http://localhost:8000/
 The build fails if the freeze totals disagree with `summary.json`, if the search index does not match those totals, or if a person_id, conflict, or QS
 file or column would appear in `site/`. All asset paths are relative, so the same files work at the
 project-pages URL and on localhost. Data is fetched with `fetch()`, so open the site over HTTP, not `file://`.
-On a narrow screen the catalog keeps the search box, journal finder, and year and issue chips in reach. Previous and Next are full-width tap targets, and each item keeps Copy DOI beside Cite.
+On a narrow screen the catalog keeps the search box, journal finder, and year and issue chips in reach. Previous and Next are full-width tap targets, each item keeps Copy DOI beside Cite, and each author name is at least 44px tall.
 
 ## Publishing
 
