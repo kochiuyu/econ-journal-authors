@@ -9,7 +9,13 @@
    On an issue, Previous and Next follow shard.issues order
    (year, volume, issue as sorted at build time), including across
    a year or volume. Cite copies a plain-text citation and BibTeX
-   from the fields already on the item. */
+   from the fields already on the item.
+   A query that is a DOI (10.…, https://doi.org/…, or http://dx.doi.org/…)
+   looks up data/search/doi.json and opens that issue with item=.
+   A DOI that is not in the file is reported as missing.
+   Each displayed author name links to a site-wide search for that
+   name string. The label is "Search for this name". It is not an
+   author page and does not use a person id. */
 (function () {
   "use strict";
 
@@ -51,6 +57,10 @@
   var searchCache = {};
   var searchInflight = {};
   var searchGen = 0;
+  var doiCache = null;
+  var doiInflight = null;
+  var doiTimer = null;
+  var doiImmediate = false;
   var journalFilter = "";
   var combo = { open: false, active: -1, matches: [] };
   var limit = SEARCH_PAGE;
@@ -75,6 +85,18 @@
   }
 
   function queryText() { return (state.q || "").trim(); }
+
+  function parseDoiQuery(q) {
+    var s = String(q || "").replace(/^\s+|\s+$/g, "");
+    if (!s) return "";
+    var m = s.match(/^(?:https?:\/\/(?:dx\.)?doi\.org\/|doi:)?(10\.\d{4,9}\/\S+)$/i);
+    if (!m) return "";
+    var doi = m[1];
+    if (/^https?:\/\//i.test(s)) doi = doi.replace(/[?#].*$/, "");
+    doi = doi.replace(/\/+$/, "");
+    if (!/^10\.\d{4,9}\/\S+$/i.test(doi)) return "";
+    return doi.toLowerCase();
+  }
 
   function pageSize() { return (!state.journal && queryText()) ? SEARCH_PAGE : PAGE; }
 
@@ -480,11 +502,11 @@
     }
     if (els.q.value !== state.q) els.q.value = state.q;
     if (state.journal && bySlug[state.journal]) {
-      els.qLabel.textContent = "Search titles and names in this journal";
-      els.q.placeholder = "e.g. minimum wage, Duflo";
+      els.qLabel.textContent = "Search titles and names in this journal, or paste a DOI";
+      els.q.placeholder = "e.g. minimum wage, Duflo, or a DOI";
     } else {
-      els.qLabel.textContent = "Search titles and authors in all journals";
-      els.q.placeholder = "e.g. minimum wage, Duflo";
+      els.qLabel.textContent = "Search titles, author names, or a DOI";
+      els.q.placeholder = "e.g. minimum wage, Duflo, or a DOI";
     }
     els.all.hidden = !state.journal;
     els.all.textContent = queryText() ? "Search all journals" : "Show all journals";
@@ -563,9 +585,102 @@
     return t !== "a";
   }
 
+  /* NAME_RANGES_START
+     Split a displayed author string into the names already in that string.
+     Separators stay in the gaps, so the visible line is unchanged.
+     A single "Last, First" name is not split. "Jr." stays with its name. */
+  function nameRange(s, start, end) {
+    return { start: start, end: end, text: s.slice(start, end) };
+  }
+
+  function trimRange(s, start, end) {
+    while (start < end && /\s/.test(s.charAt(start))) start++;
+    while (end > start && /\s/.test(s.charAt(end - 1))) end--;
+    return end > start ? nameRange(s, start, end) : null;
+  }
+
+  function semicolonRanges(s) {
+    var parts = [];
+    var re = /[^;]+/g;
+    var m;
+    while ((m = re.exec(s))) {
+      var raw = m[0];
+      var lead = raw.length - raw.replace(/^\s+/, "").length;
+      var trail = raw.length - raw.replace(/\s+$/, "").length;
+      var hit = trimRange(s, m.index + lead, m.index + raw.length - trail);
+      if (hit) parts.push(hit);
+    }
+    if (parts.length >= 3) {
+      var first = parts[0].text;
+      var rest = parts.slice(1);
+      var duplicated = rest.every(function (p) { return p.text && first.indexOf(p.text) !== -1; })
+        && (first.indexOf("\u24e1") !== -1 || first.indexOf(" and ") !== -1);
+      if (duplicated) {
+        var sub = [];
+        var cursor = parts[0].start;
+        var limit = parts[0].end;
+        var ok = true;
+        for (var i = 0; i < rest.length; i++) {
+          var n = rest[i].text;
+          var idx = s.indexOf(n, cursor);
+          if (idx < 0 || idx + n.length > limit) { ok = false; break; }
+          sub.push(nameRange(s, idx, idx + n.length));
+          cursor = idx + n.length;
+        }
+        if (ok) return sub.concat(rest);
+      }
+    }
+    return parts;
+  }
+
+  function maskSuffixes(s) {
+    return s.replace(/,\s+(?:Jr\.?|Sr\.?|III|II|IV|Esq\.?)(?=,|\s+and\s+|$)/gi, function (m) {
+      return new Array(m.length + 1).join("\u0001");
+    });
+  }
+
+  function bylineRanges(s) {
+    var masked = maskSuffixes(s);
+    var re = /,\s+and\s+|,\s+|\s+and\s+|\s*\u24e1\s*/g;
+    var ranges = [];
+    var last = 0;
+    var m;
+    while ((m = re.exec(masked))) {
+      var hit = trimRange(s, last, m.index);
+      if (hit) ranges.push(hit);
+      last = m.index + m[0].length;
+    }
+    var tail = trimRange(s, last, s.length);
+    if (tail) ranges.push(tail);
+    return ranges.length ? ranges : [nameRange(s, 0, s.length)];
+  }
+
+  function nameRanges(s) {
+    if (!s) return [];
+    if (s.indexOf(";") !== -1) return semicolonRanges(s);
+    if (s.indexOf(" and ") !== -1 || s.indexOf("\u24e1") !== -1) return bylineRanges(s);
+    return [nameRange(s, 0, s.length)];
+  }
+  /* NAME_RANGES_END */
+
   function authorLine(authors, src) {
     if (!authors) return el("div", { class: "authors muted", text: "No author names in this release" });
-    var kids = [el("span", { text: authors })];
+    var kids = [];
+    var ranges = nameRanges(authors);
+    var cursor = 0;
+    ranges.forEach(function (r) {
+      if (r.start > cursor) kids.push(authors.slice(cursor, r.start));
+      var name = authors.slice(r.start, r.end);
+      kids.push(el("a", {
+        class: "author-name",
+        href: buildQuery({ journal: "", year: "", volume: "", issue: "", type: "research", q: name, item: "" }),
+        "data-name": name,
+        title: "Search for this name",
+        "aria-label": "Search for this name: " + name
+      }, [name]));
+      cursor = r.end;
+    });
+    if (cursor < authors.length) kids.push(authors.slice(cursor));
     if (src && SRC_LABEL[src]) kids.push(el("span", { class: "src", title: SRC_TITLE[src], text: SRC_LABEL[src] }));
     return el("div", { class: "authors" }, kids);
   }
@@ -909,6 +1024,10 @@
       setTypeCounts(counts);
       var typeWord = state.type === "research" ? "research articles" : state.type === "other" ? "other and proceedings items" : "items";
       els.count.textContent = fmt(hits.length) + " " + typeWord + " matching “" + q + "” in all journals.";
+      els.results.appendChild(el("p", {
+        class: "hint",
+        text: "This searches titles and author-name strings. The same display name is not one person."
+      }));
       if (!hits.length) {
         var empty = "No titles or author names match.";
         if (state.type === "research") empty = "No research articles match. Choose “Other and proceedings” or “All items” to include the rest.";
@@ -932,11 +1051,95 @@
     });
   }
 
+  function loadDoiIndex() {
+    if (doiCache) return Promise.resolve(doiCache);
+    if (doiInflight) return doiInflight;
+    doiInflight = fetch("data/search/doi.json").then(function (r) {
+      if (!r.ok) throw new Error("doi.json " + r.status);
+      return r.json();
+    }).then(function (d) {
+      doiCache = d;
+      return d;
+    }).catch(function (e) {
+      doiInflight = null;
+      throw e;
+    });
+    return doiInflight;
+  }
+
+  function openDoi(rec) {
+    var slug = doiCache && doiCache.journals ? doiCache.journals[rec[0]] : "";
+    if (!slug) return;
+    var typ = rec[5];
+    journalFilter = "";
+    state.journal = slug;
+    state.year = String(rec[1]);
+    state.volume = String(rec[2]);
+    state.issue = String(rec[3]);
+    state.item = String(rec[4]);
+    state.q = "";
+    state.type = state.type === "all" ? "all" : (typ === "a" ? "research" : "other");
+    commit(false);
+  }
+
+  function showDoiMissing(doi) {
+    els.results.removeAttribute("aria-busy");
+    els.results.innerHTML = "";
+    els.heading.textContent = "DOI not in this catalog";
+    document.title = "DOI not in this catalog — Journal Articles";
+    els.count.textContent = doi + " is not in this catalog.";
+    setTypeCounts(null);
+    els.results.appendChild(el("p", {
+      class: "empty",
+      text: doi + " is not in the 2012–2025 catalog. Nothing was added from outside this release."
+    }));
+  }
+
+  function renderDoiLookup(doi) {
+    var gen = searchGen;
+    var immediate = doiImmediate;
+    doiImmediate = false;
+    els.yearRow.hidden = true;
+    els.issueRow.hidden = true;
+    els.crumbs.innerHTML = "";
+    els.crumbs.appendChild(el("a", { href: "catalog.html", text: "All journals" }));
+    els.crumbs.appendChild(document.createTextNode(" \u203a "));
+    els.crumbs.appendChild(el("span", { text: "DOI" }));
+    els.heading.textContent = "Looking up DOI";
+    document.title = "Looking up DOI — Journal Articles";
+    els.count.textContent = "Looking up " + doi + "\u2026";
+    setTypeCounts(null);
+    els.results.setAttribute("aria-busy", "true");
+    loadDoiIndex().then(function (data) {
+      if (gen !== searchGen) return;
+      if (parseDoiQuery(queryText()) !== doi) return;
+      var rec = data.items ? data.items[doi] : null;
+      var delay = immediate || document.activeElement !== els.q ? 0 : 600;
+      doiTimer = setTimeout(function () {
+        doiTimer = null;
+        if (gen !== searchGen) return;
+        if (parseDoiQuery(queryText()) !== doi) return;
+        if (rec) openDoi(rec);
+        else showDoiMissing(doi);
+      }, delay);
+    }).catch(function (e) {
+      if (gen !== searchGen) return;
+      els.results.removeAttribute("aria-busy");
+      els.count.textContent = "Could not load the DOI index (" + e.message + "). Serve the site over HTTP.";
+    });
+  }
+
   function render() {
     searchGen++;
+    if (doiTimer) { clearTimeout(doiTimer); doiTimer = null; }
     syncControls();
     els.results.innerHTML = "";
     els.results.removeAttribute("aria-busy");
+    var doi = parseDoiQuery(queryText());
+    if (doi) {
+      renderDoiLookup(doi);
+      return;
+    }
     var j = bySlug[state.journal];
     if (state.journal && !j) {
       crumbs(null);
@@ -1127,6 +1330,18 @@
     if (copyBtn) startCiteCopy(copyBtn);
   });
   els.results.addEventListener("click", function (e) {
+    var nameLink = e.target.closest && e.target.closest("a.author-name");
+    if (nameLink) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      e.preventDefault();
+      journalFilter = "";
+      state = {
+        journal: "", year: "", volume: "", issue: "",
+        type: "research", q: nameLink.getAttribute("data-name") || "", item: ""
+      };
+      commit(true);
+      return;
+    }
     copyFromEvent(e);
     citeFromEvent(e);
   });
@@ -1212,13 +1427,24 @@
     commit(true);
   });
   var timer = null;
-  els.q.addEventListener("input", function () {
+  els.q.addEventListener("input", function (e) {
+    if (e.inputType === "insertFromPaste" && parseDoiQuery(els.q.value)) doiImmediate = true;
     clearTimeout(timer);
     timer = setTimeout(function () {
       state.q = els.q.value;
       state.item = "";
       commit(false);
     }, 200);
+  });
+  els.q.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter") return;
+    if (!parseDoiQuery(els.q.value)) return;
+    e.preventDefault();
+    doiImmediate = true;
+    clearTimeout(timer);
+    state.q = els.q.value;
+    state.item = "";
+    commit(false);
   });
   els.types.addEventListener("click", function (e) {
     var b = e.target.closest && e.target.closest("button[data-type]");
