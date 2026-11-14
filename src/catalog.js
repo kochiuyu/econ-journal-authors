@@ -535,7 +535,7 @@
     }
     if (j) {
       parts.push(" › ");
-      parts.push(state.year ? el("a", { href: buildQuery({ journal: j.slug, year: "", issue: "", volume: "", type: state.type, q: "" }), text: j.name }) : el("span", { text: j.name }));
+      parts.push(el("a", { href: "journals/" + encodeURIComponent(j.slug) + ".html", text: j.name }));
       if (state.year) {
         parts.push(" › ");
         parts.push(state.issue ? el("a", { href: buildQuery({ journal: j.slug, year: state.year, issue: "", volume: "", type: state.type, q: "" }), text: state.year }) : el("span", { text: state.year }));
@@ -553,23 +553,25 @@
     var shown = journalMatches(journalFilter);
     var noun = shown.length === 1 ? "journal" : "journals";
     var extra = terms.length ? " matching “" + journalFilter.trim() + "”" : "";
-    els.count.textContent = fmt(shown.length) + " " + noun + extra + ". Pick one to load its table of contents.";
+    els.count.textContent = fmt(shown.length) + " " + noun + extra + ". A name opens that journal’s page. Browse opens its table of contents.";
     if (!shown.length) {
       els.results.appendChild(el("p", { class: "empty", text: "No journal name matches." }));
       return;
     }
     var list = el("div", { class: "jlist" });
     shown.forEach(function (j) {
-      list.appendChild(el("a", {
-        class: "jrow",
-        href: buildQuery({ journal: j.slug, year: "", issue: "", volume: "", type: state.type, q: "" })
-      }, [
-        el("span", { class: "jname", text: j.name }),
+      list.appendChild(el("div", { class: "jrow" }, [
+        el("a", { class: "jname", href: "journals/" + encodeURIComponent(j.slug) + ".html", text: j.name }),
         el("span", { class: "jmeta", text: j.year_start + "–" + j.year_end + " · " + fmt(j.issues) + " issues · " + fmt(j.other) + " other" }),
         el("span", { class: "jnums" }, [
           el("span", null, [el("strong", { text: fmt(j.research) }), " research"]),
           el("span", null, [el("strong", { text: fmt(j.items) }), " items"])
-        ])
+        ]),
+        el("a", {
+          class: "jbrowse",
+          href: buildQuery({ journal: j.slug, year: "", issue: "", volume: "", type: state.type, q: "" }),
+          text: "Browse"
+        })
       ]));
     });
     els.results.appendChild(list);
@@ -837,9 +839,11 @@
     });
     setTypeCounts(counts);
 
-    var scope = j.name + (state.year ? ", " + state.year : "") + (state.issue ? ", " + issueLabel(state.volume, state.issue) : "");
-    els.heading.textContent = scope;
-    document.title = scope + " — Journal Articles";
+    var tail = (state.year ? ", " + state.year : "") + (state.issue ? ", " + issueLabel(state.volume, state.issue) : "");
+    els.heading.textContent = "";
+    els.heading.appendChild(el("a", { href: "journals/" + encodeURIComponent(shard.slug) + ".html", text: j.name }));
+    if (tail) els.heading.appendChild(document.createTextNode(tail));
+    document.title = j.name + tail + " — Journal Articles";
     var typeWord = state.type === "research" ? "research articles" : state.type === "other" ? "other and proceedings items" : "items";
 
     if (!state.year && !terms.length) {
@@ -977,9 +981,12 @@
       journal: slug, year: year, volume: vol, issue: issue,
       type: typeFor(typ), q: "", item: String(n)
     });
-    var where = jname + " · " + year + " · " + issueLabel(vol, issue);
     return el("li", { class: "item" }, [
-      el("div", { class: "where" }, [el("a", { href: href, text: where })]),
+      el("div", { class: "where" }, [
+        el("a", { class: "jname", href: "journals/" + encodeURIComponent(slug) + ".html", text: jname }),
+        " · ",
+        el("a", { href: href, text: year + " · " + issueLabel(vol, issue) })
+      ]),
       el("h2", { class: "title" + (title ? "" : " untitled") }, [
         el("span", { class: "badge " + TYPE_CLASS[typ], text: TYPE_LABEL[typ] }),
         el("a", { href: href, text: title || "(No title in the TOC record)" })

@@ -10,6 +10,8 @@ Also writes site/data/search/{research,other}.json, a title-and-author
 index for site-wide search. It uses the same display names as the shards.
 Also writes site/data/search/doi.json, a compact DOI-to-issue map.
 DOIs are lowercased. The file has no titles, names, or person ids.
+Also writes site/journals/index.html and site/journals/<slug>.html from the
+same freeze (counts, coverage, and issue links into the catalog).
 """
 from __future__ import annotations
 
@@ -17,15 +19,18 @@ import csv
 import gzip
 import html
 import json
+import re
 import shutil
 import sys
 from collections import Counter, OrderedDict
 from pathlib import Path
+from urllib.parse import quote, unquote
 
 ROOT = Path(__file__).resolve().parent.parent
 FREEZE = ROOT / "releases" / "articles_toc_2010_2025"
 SRC = ROOT / "src"
 SITE = ROOT / "site"
+ASSET_Q = "v=7"
 
 ARTICLE_SITE = "https://kochiuyu.github.io/econ-journal-authors/"
 ARTICLE_REPO = "https://github.com/kochiuyu/econ-journal-authors"
@@ -237,13 +242,16 @@ def check_doi(doi_obj, summary):
     return problems
 
 
-def page(title, description, active, body, canonical_path="", extra_head="", scripts=""):
-    nav_items = [("./", "Home", "home"), ("catalog.html", "Catalog", "catalog"),
-                 ("index.html#journals", "Journals", "journals"), ("index.html#about", "About", "about"),
+def page(title, description, active, body, canonical_path="", extra_head="", scripts="", rel=""):
+    home = "../" if rel else "./"
+    nav_items = [(home, "Home", "home"), (f"{rel}catalog.html", "Catalog", "catalog"),
+                 (f"{rel}journals/index.html", "Journals", "journals"),
+                 (f"{rel}index.html#about", "About", "about"),
                  (ARTICLE_REPO + "#readme", "GitHub", "github")]
     nav = "\n        ".join(
         f'<a href="{esc(h)}"{" aria-current=\"page\"" if k == active else ""}>{esc(l)}</a>'
         for h, l, k in nav_items)
+    sheet = extra_head or f'<link rel="stylesheet" href="{rel}style.css?{ASSET_Q}">'
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -258,13 +266,13 @@ def page(title, description, active, body, canonical_path="", extra_head="", scr
   <!-- Project Pages base: /econ-journal-authors/. Asset URLs are relative so the
        site also works under `python -m http.server` from site/. -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23142833'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='15' fill='%23f4f1ea'%3EJa%3C/text%3E%3C/svg%3E">
-  {extra_head or '<link rel="stylesheet" href="style.css?v=6">'}
+  {sheet}
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="topbar">
     <div class="wrap bar">
-      <a class="brand" href="./">
+      <a class="brand" href="{home}">
         <span class="logo" aria-hidden="true">Ja</span>
         <span>
           <span class="t1">Journal Articles</span>
@@ -333,9 +341,321 @@ ABOUT_HTML = """    <section class="prose" id="about" aria-labelledby="about-tit
         The repository is <a href="{repo}">kochiuyu/econ-journal-authors</a>.
         Searching all journals uses <code>data/search/</code>, a title-and-author index built from the same freeze, not the raw article table.
         DOI lookup uses <code>data/search/doi.json</code>, a location map from the same freeze.
+        Each journal has a page on <a href="journals/index.html">Journals</a>, with the counts, years, and issues in this freeze. A year or an issue on that page opens the catalog.
       </p>
     </section>
 """
+
+
+def catalog_href(prefix, slug, year=None, volume=None, issue=None) -> str:
+    pairs = [("journal", slug)]
+    if year is not None and str(year) != "":
+        pairs.append(("year", str(year)))
+    if volume is not None and issue is not None and str(volume) != "" and str(issue) != "":
+        pairs.append(("volume", str(volume)))
+        pairs.append(("issue", str(issue)))
+    return prefix + "catalog.html?" + "&".join(f"{k}={quote(v, safe='')}" for k, v in pairs)
+
+
+def built_stamp(summary) -> str:
+    raw = summary["created_at"]
+    return raw[:10] + " " + raw[11:16]
+
+
+def sum_int(rows, key) -> int:
+    return sum(int(r[key]) for r in rows)
+
+
+def issn_phrase(issn_l: str, issn: str) -> str:
+    parts = []
+    if issn_l.strip():
+        parts.append("ISSN-L " + issn_l.strip())
+    issns = [s.strip() for s in issn.split(";") if s.strip()]
+    if issns:
+        parts.append("ISSN " + ", ".join(issns))
+    return " · ".join(parts)
+
+
+def years_sentence(j) -> str:
+    span = f'{j["year_start"]}–{j["year_end"]}'
+    if j["year_start"] == 2010 and j["year_end"] == 2025:
+        return f"Years covered: {span} ({fmt(j['years'])} journal-years)."
+    return (f"{j['name']} starts in {j['year_start']}, so this page covers {span} "
+            f"({fmt(j['years'])} journal-years).")
+
+
+def window_sentence(jindex) -> str:
+    late = [j for j in jindex if not (j["year_start"] == 2010 and j["year_end"] == 2025)]
+    early = len(jindex) - len(late)
+    if not late:
+        return "Every journal runs 2010–2025."
+    if len(late) == 1:
+        j = late[0]
+        return f"{j['name']} starts in {j['year_start']}. The other {early} journals run 2010–2025."
+    bits = ", ".join(f"{j['name']} ({j['year_start']}–{j['year_end']})" for j in late)
+    return f"{bits}. The other {early} journals run 2010–2025."
+
+
+SORT_COLUMNS = [
+    ("name", "Journal", "Journal"),
+    ("publisher", "Publisher", "Publisher"),
+    ("years", "Years", "Years"),
+    ("journal-years", "Journal-years", "Journal-years"),
+    ("issues", "Issues", "Issues"),
+    ("items", "Items", "Items"),
+    ("research", "Research", "Research"),
+    ("other", "Other", "Other"),
+    ("doi", "With a DOI", "Items with a DOI"),
+    ("item-names", "With names", "Items with names"),
+    ("research-names", "Research names", "Research with names"),
+]
+
+
+def journals_index_body(jindex, journal_extra, summary) -> str:
+    stamp = built_stamp(summary)
+    options = "\n".join(
+        f'        <option value="{esc(key)}">{esc(label)}</option>'
+        for key, _short, label in SORT_COLUMNS)
+    heads = []
+    for key, short, _label in SORT_COLUMNS:
+        num = ' class="num"' if key not in ("name", "publisher") else ""
+        pressed = ' aria-pressed="true"' if key == "name" else ' aria-pressed="false"'
+        sort_attr = ' aria-sort="ascending"' if key == "name" else ""
+        heads.append(
+            f'<th scope="col"{num}{sort_attr}><button type="button" class="sort" data-sort="{esc(key)}"{pressed}>{esc(short)}</button></th>')
+    rows = []
+    for j in jindex:
+        ex = journal_extra[j["slug"]]
+        pub = PUBLISHER_LABEL.get(j["publisher"], j["publisher"])
+        years_key = j["year_start"] * 10000 + j["year_end"]
+        attrs = {
+            "name": j["name"].lower(),
+            "publisher": pub.lower(),
+            "years": str(years_key),
+            "journal-years": str(j["years"]),
+            "issues": str(j["issues"]),
+            "items": str(j["items"]),
+            "research": str(j["research"]),
+            "other": str(j["other"]),
+            "doi": str(ex["items_with_doi"]),
+            "item-names": str(ex["items_with_authors"]),
+            "research-names": str(ex["research_with_authors"]),
+        }
+        attr = " ".join(f'data-{k}="{esc(v)}"' for k, v in attrs.items())
+        span = f'{j["year_start"]}–{j["year_end"]}'
+        cells = [
+            ("Journal", f'<a class="jname" href="{esc(j["slug"])}.html">{esc(j["name"])}</a>', False),
+            ("Publisher", esc(pub), True),
+            ("Years", esc(span), True),
+            ("Journal-years", fmt(j["years"]), True),
+            ("Issues", fmt(j["issues"]), True),
+            ("Items", fmt(j["items"]), True),
+            ("Research", fmt(j["research"]), True),
+            ("Other", fmt(j["other"]), True),
+            ("Items with a DOI", fmt(ex["items_with_doi"]), True),
+            ("Items with names", fmt(ex["items_with_authors"]), True),
+            ("Research with names", fmt(ex["research_with_authors"]), True),
+        ]
+        tds = []
+        for label, inner, is_num in cells:
+            cls = ' class="num"' if is_num else ""
+            tds.append(f'<td{cls} data-label="{esc(label)}">{inner}</td>')
+        rows.append(f'          <tr {attr}>{"".join(tds)}</tr>')
+    n = summary["journals"]
+    return f"""    <h1 class="page-title">Journals</h1>
+    <p class="intro">
+      All {n} journals in the 2010–2025 freeze, built {esc(stamp)} (Asia/Hong_Kong).
+      {esc(window_sentence(jindex))}
+      A journal name opens that journal’s page. From there, a year or an issue opens the catalog.
+    </p>
+    <div class="sortbar">
+      <label class="lbl" for="journal-sort">Sort by</label>
+      <div class="sortbar-row">
+        <select id="journal-sort">
+{options}
+        </select>
+        <button type="button" class="btn" id="journal-sort-dir" aria-label="Reverse sort direction. Currently A to Z.">A to Z</button>
+      </div>
+      <p class="hint" id="journal-sort-status" role="status">Sorted by journal name, A to Z.</p>
+    </div>
+    <noscript><p class="hint">Sorting needs JavaScript. The table is in journal-name order.</p></noscript>
+    <div class="tbl-wrap">
+      <table class="responsive sortable" id="journal-table">
+        <caption>{n} journals. Counts are TOC items in the 2010–2025 freeze. A journal name opens that journal’s page.</caption>
+        <thead><tr>
+          {''.join(heads)}
+        </tr></thead>
+        <tbody>
+{chr(10).join(rows)}
+        </tbody>
+      </table>
+    </div>
+"""
+
+
+def journal_page_body(j, ex, issues, stamp: str) -> str:
+    pub = PUBLISHER_LABEL.get(j["publisher"], j["publisher"])
+    issn = issn_phrase(ex["issn_l"], ex["issn"])
+    slug = j["slug"]
+    doi_gap = j["items"] - ex["items_with_doi"]
+    doi_sub = "Every item has a DOI" if doi_gap == 0 else f"{fmt(doi_gap)} TOC records without one"
+    if ex["research_missing"] == 0:
+        names_sub = f"{fmt(ex['research_with_authors'])} research with names. Every research article in this journal has names."
+    else:
+        names_sub = (f"{fmt(ex['research_with_authors'])} research with names. "
+                     f"{fmt(ex['research_missing'])} research articles without names.")
+    meta_bits = [pub]
+    if issn:
+        meta_bits.append(issn)
+    meta_bits.append(years_sentence(j))
+    meta = " · ".join(meta_bits)
+    groups = []
+    for iss in issues:
+        if not groups or groups[-1][0] != iss[0]:
+            groups.append((iss[0], []))
+        groups[-1][1].append(iss)
+    cards = []
+    for year, lst in groups:
+        tot = sum(i[4] for i in lst)
+        res = sum(i[5] for i in lst)
+        multi = len({i[1] for i in lst}) > 1
+        links = []
+        for i in lst:
+            label = f"{i[1]}({i[2]})" if multi else str(i[2])
+            href = catalog_href("../", slug, i[0], i[1], i[2])
+            aria = f"{year} Vol. {i[1]}, Issue {i[2]}"
+            links.append(f'<li><a href="{esc(href)}" aria-label="{esc(aria)}">{esc(label)}</a></li>')
+        year_href = catalog_href("../", slug, year)
+        noun = "issue" if len(lst) == 1 else "issues"
+        cards.append(
+            f'        <div class="year-card">'
+            f'<h3><a href="{esc(year_href)}">{esc(year)}</a></h3>'
+            f'<div class="sub">{len(lst)} {noun} · {fmt(tot)} items · {fmt(res)} research</div>'
+            f'<ul class="issue-links">{"".join(links)}</ul></div>')
+    cov_rows = []
+    miss_by_year = {m["year"]: m for m in ex["missing"]}
+    for c in ex["coverage"]:
+        m = miss_by_year[c["year"]]
+        href = catalog_href("../", slug, c["year"])
+        cov_rows.append(
+            f'          <tr><td data-label="Year"><a class="jname" href="{esc(href)}">{esc(c["year"])}</a></td>'
+            f'<td class="num" data-label="Issues">{fmt(c["issues"])}</td>'
+            f'<td class="num" data-label="Items">{fmt(c["items"])}</td>'
+            f'<td class="num" data-label="Research">{fmt(c["research_articles"])}</td>'
+            f'<td class="num" data-label="Other">{fmt(c["other_items"])}</td>'
+            f'<td class="num" data-label="Items with a DOI">{fmt(c["items_with_doi"])}</td>'
+            f'<td class="num" data-label="Items with names">{fmt(c["items_with_authors"])}</td>'
+            f'<td class="num" data-label="Research with names">{fmt(m["with_authors"])}</td></tr>')
+    browse = catalog_href("../", slug)
+    return f"""    <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Journals</a> › {esc(j["name"])}</nav>
+    <h1 class="page-title">{esc(j["name"])}</h1>
+    <p class="intro">{esc(meta)} Counts are TOC items in the 2010–2025 freeze, built {esc(stamp)} (Asia/Hong_Kong).</p>
+    <p class="page-actions"><a class="btn primary" href="{esc(browse)}">Browse this journal</a></p>
+    <section class="stats" aria-label="{esc(j["name"])} totals">
+      <div class="stat"><div class="n">{fmt(j["issues"])}</div><div class="l">Issues</div>
+        <div class="sub">{esc(f'{j["year_start"]}–{j["year_end"]}')}</div></div>
+      <div class="stat"><div class="n">{fmt(j["items"])}</div><div class="l">TOC items</div>
+        <div class="sub">{fmt(j["research"])} research · {fmt(j["other"])} other</div></div>
+      <div class="stat"><div class="n">{fmt(ex["items_with_doi"])}</div><div class="l">Items with a DOI</div>
+        <div class="sub">{doi_sub}</div></div>
+      <div class="stat"><div class="n">{fmt(ex["items_with_authors"])}</div><div class="l">Items with names</div>
+        <div class="sub">{names_sub}</div></div>
+    </section>
+    <p class="hint">Research-article names: {fmt(ex["from_publisher"])} from the publisher, {fmt(ex["from_openalex"])} from OpenAlex, {fmt(ex["from_crossref"])} from Crossref. Names are shown on each catalog item, with their source.</p>
+
+    <h2 class="section-title">Coverage by year</h2>
+    <div class="tbl-wrap">
+      <table class="responsive">
+        <caption>One row per year in the freeze. A year opens that year in the catalog.</caption>
+        <thead><tr><th scope="col">Year</th><th scope="col" class="num">Issues</th><th scope="col" class="num">Items</th>
+          <th scope="col" class="num">Research</th><th scope="col" class="num">Other</th><th scope="col" class="num">With a DOI</th>
+          <th scope="col" class="num">With names</th><th scope="col" class="num">Research with names</th></tr></thead>
+        <tbody>
+{chr(10).join(cov_rows)}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="section-title">Issues</h2>
+    <p class="hint">Each issue opens in the catalog. The label is the TOC issue; a volume prefix appears when a year has more than one volume. Elsevier continuous-publication volumes use issue “C”.</p>
+    <div class="years">
+{chr(10).join(cards)}
+    </div>
+"""
+
+
+def check_journal_pages(jindex, journal_extra, issues_by_j, issue_index) -> list:
+    problems = []
+    jdir = SITE / "journals"
+    pages = [p for p in jdir.glob("*.html") if p.name != "index.html"]
+    if len(pages) != len(jindex) or len(jindex) != 49:
+        problems.append(f"{len(pages)} journal pages, {len(jindex)} journals")
+    index_html = (jdir / "index.html").read_text(encoding="utf-8")
+    hub = (SITE / "index.html").read_text(encoding="utf-8")
+    forbidden = ("person_id", "spine_id", "qs_", "handoff", "econ-journal-dispersion",
+                 "Geographic Dispersion", "openalex_source_id")
+    if 'href="journals/index.html"' not in hub or 'href="index.html#journals"' in hub:
+        problems.append("hub Journals link is not the journals index")
+    if 'href="../style.css?' + ASSET_Q + '"' not in index_html:
+        problems.append("journals index stylesheet")
+    if re.search(r'(?:href|src)="/', index_html):
+        problems.append("journals index root-absolute URL")
+    for token in forbidden:
+        if token in index_html:
+            problems.append(f"forbidden {token} in journals index")
+    for j in jindex:
+        slug = j["slug"]
+        path = jdir / f"{slug}.html"
+        if not path.is_file():
+            problems.append(f"missing page {slug}")
+            continue
+        if f'href="journals/{slug}.html"' not in hub:
+            problems.append(f"hub missing {slug}")
+        if f'href="{slug}.html"' not in index_html:
+            problems.append(f"index missing {slug}")
+        text = path.read_text(encoding="utf-8")
+        for token in forbidden:
+            if token in text:
+                problems.append(f"forbidden {token} in {slug}")
+                break
+        if 'href="../style.css?' + ASSET_Q + '"' not in text:
+            problems.append(f"{slug} stylesheet")
+        if re.search(r'(?:href|src)="/', text):
+            problems.append(f"{slug} root-absolute URL")
+        ex = journal_extra[slug]
+        for c in ex["coverage"]:
+            if esc(catalog_href("../", slug, c["year"])) not in text:
+                problems.append(f"{slug} missing year {c['year']}")
+                break
+        for iss in issues_by_j[slug]:
+            if esc(catalog_href("../", slug, iss[0], iss[1], iss[2])) not in text:
+                problems.append(f"{slug} missing issue {iss[0]} {iss[1]}({iss[2]})")
+                break
+        for match in re.finditer(r'href="(\.\./catalog\.html\?[^"]+)"', text):
+            params = {}
+            query = html.unescape(match.group(1)).split("?", 1)[1]
+            for part in query.split("&"):
+                k, v = part.split("=", 1)
+                params[k] = unquote(v)
+            if params.get("journal") != slug:
+                problems.append(f"{slug} links to {params.get('journal')}")
+                break
+            if "year" not in params:
+                if set(params) != {"journal"}:
+                    problems.append(f"{slug} unexpected catalog link {params}")
+                    break
+                continue
+            year = params["year"]
+            if "volume" in params or "issue" in params:
+                key = (slug, year, params.get("volume", ""), params.get("issue", ""))
+                if key not in issue_index:
+                    problems.append(f"unresolved catalog link {key}")
+                    break
+            elif not any(c["year"] == year for c in ex["coverage"]):
+                problems.append(f"{slug} bad year link {year}")
+                break
+    return problems
+
 
 
 def main() -> int:
@@ -344,6 +664,7 @@ def main() -> int:
     issues = read_csv("issues.csv")
     journals = read_csv("journals.csv")
     coverage = read_csv("coverage.csv")
+    missing = read_csv("authors_missing_by_journal_year.csv")
 
     # ---- Verify the freeze against its own summary ------------------------
     checks = {
@@ -363,6 +684,12 @@ def main() -> int:
         bad["authors_source_counts"] = (dict(src_counts), summary["authors_source_counts"])
     if summary.get("person_ids_included") is not False:
         bad["person_ids_included"] = summary.get("person_ids_included")
+    if len(missing) != summary["journal_years"]:
+        bad["authors_missing_rows"] = (len(missing), summary["journal_years"])
+    cov_keys = {(c["journal_slug"], c["year"]) for c in coverage}
+    miss_keys = {(m["journal_slug"], m["year"]) for m in missing}
+    if cov_keys != miss_keys:
+        bad["authors_missing_keys"] = len(cov_keys.symmetric_difference(miss_keys))
     for r in articles:
         t = r["article_type"]
         if t not in TYPE_CODE or (t == "article") != (r["is_research"] == "1"):
@@ -404,6 +731,7 @@ def main() -> int:
         ])
 
     jindex = []
+    journal_extra = {}
     search_rows = []
     doi_rows = []
     shard_sizes = {}
@@ -435,7 +763,50 @@ def main() -> int:
         out = SITE / "data" / "journals" / f"{slug}.json"
         out.write_text(json.dumps(shard, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
         shard_sizes[slug] = out.stat().st_size
-        cov = [c for c in coverage if c["journal_slug"] == slug]
+        cov = sorted((c for c in coverage if c["journal_slug"] == slug), key=lambda r: int(r["year"]))
+        miss = sorted((m for m in missing if m["journal_slug"] == slug), key=lambda r: int(r["year"]))
+        if [c["year"] for c in cov] != [m["year"] for m in miss]:
+            print(f"Coverage and author-year rows differ for {slug}", file=sys.stderr)
+            return 1
+        ex = {
+            "items_with_doi": sum_int(cov, "items_with_doi"),
+            "items_with_authors": sum_int(cov, "items_with_authors"),
+            "research_with_authors": sum_int(miss, "with_authors"),
+            "research_missing": sum_int(miss, "missing"),
+            "from_publisher": (sum_int(miss, "source_spine") + sum_int(miss, "source_toc_official_qe")
+                               + sum_int(miss, "source_other")),
+            "from_openalex": sum_int(miss, "source_openalex_via_registry") + sum_int(miss, "source_openalex"),
+            "from_crossref": sum_int(miss, "source_crossref"),
+            "coverage": cov,
+            "missing": miss,
+            "issn_l": j["issn_l"],
+            "issn": j["issn"],
+        }
+        if ex["from_publisher"] + ex["from_openalex"] + ex["from_crossref"] != ex["research_with_authors"]:
+            print(f"Research name sources do not add up for {slug}", file=sys.stderr)
+            return 1
+        if sum_int(cov, "items") != int(j["items"]) or sum_int(cov, "issues") != int(j["issues"]):
+            print(f"Coverage totals do not match journals.csv for {slug}", file=sys.stderr)
+            return 1
+        if (sum_int(cov, "research_articles") != int(j["research_articles"])
+                or sum_int(cov, "other_items") != int(j["other_items"])):
+            print(f"Coverage research totals do not match journals.csv for {slug}", file=sys.stderr)
+            return 1
+        if sum_int(miss, "research") != int(j["research_articles"]):
+            print(f"Author-year research total does not match journals.csv for {slug}", file=sys.stderr)
+            return 1
+        if ex["research_with_authors"] + ex["research_missing"] != int(j["research_articles"]):
+            print(f"Research with and without names do not match {slug}", file=sys.stderr)
+            return 1
+        for c, mrow in zip(cov, miss):
+            if int(c["research_articles"]) != int(mrow["research"]):
+                print(f"Year research mismatch {slug} {c['year']}", file=sys.stderr)
+                return 1
+        for field in (j["display_name"], j["issn_l"], j["issn"], j["publisher_family"]):
+            if "{" in field or "}" in field:
+                print(f"Unexpected brace in journal field for {slug}", file=sys.stderr)
+                return 1
+        journal_extra[slug] = ex
         jindex.append({
             "slug": slug, "name": names[slug], "issn_l": j["issn_l"], "publisher": j["publisher_family"],
             "year_start": int(j["year_start"]), "year_end": int(j["year_end"]),
@@ -443,6 +814,16 @@ def main() -> int:
             "research": int(j["research_articles"]), "other": int(j["other_items"]),
         })
         assert len(items) == int(j["items"]), slug
+
+    if sum(ex["items_with_doi"] for ex in journal_extra.values()) != summary["items_with_doi"]:
+        print("Journal DOI totals do not match summary.json", file=sys.stderr)
+        return 1
+    if sum(ex["items_with_authors"] for ex in journal_extra.values()) != summary["items_with_authors"]:
+        print("Journal name totals do not match summary.json", file=sys.stderr)
+        return 1
+    if sum(ex["research_with_authors"] for ex in journal_extra.values()) != summary["research_with_authors"]:
+        print("Research-with-names totals do not match summary.json", file=sys.stderr)
+        return 1
 
     meta = {k: summary[k] for k in ("window", "journals", "journal_years", "issues", "items",
                                     "research_articles", "other_items", "items_with_doi",
@@ -502,13 +883,13 @@ def main() -> int:
 {dl_rows}
     </ul>
     <p><a href="../">Back to the hub</a></p>
-    </section>""").replace('href="style.css?v=6"', 'href="../style.css?v=6"').replace('href="./"', 'href="../"')
-        .replace('href="catalog.html"', 'href="../catalog.html"').replace('href="index.html#', 'href="../index.html#'),
+    </section>""", rel="../"),
         encoding="utf-8")
 
     # ---- Static assets ----------------------------------------------------
     shutil.copy2(SRC / "style.css", SITE / "style.css")
     shutil.copy2(SRC / "catalog.js", SITE / "catalog.js")
+    shutil.copy2(SRC / "journals.js", SITE / "journals.js")
     (SITE / ".nojekyll").write_text("", encoding="utf-8")
 
     built = summary["created_at"][:10]
@@ -522,7 +903,7 @@ def main() -> int:
     for j in jindex:
         yrs = f'{j["year_start"]}–{j["year_end"]}'
         rows.append(
-            f'          <tr><td data-label="Journal"><a class="jname" href="catalog.html?journal={esc(j["slug"])}">{esc(j["name"])}</a></td>'
+            f'          <tr><td data-label="Journal"><a class="jname" href="journals/{esc(j["slug"])}.html">{esc(j["name"])}</a></td>'
             f'<td class="num" data-label="Publisher">{esc(PUBLISHER_LABEL.get(j["publisher"], j["publisher"]))}</td>'
             f'<td class="num" data-label="Years">{yrs}</td><td class="num" data-label="Journal-years">{fmt(j["years"])}</td>'
             f'<td class="num" data-label="Issues">{fmt(j["issues"])}</td><td class="num" data-label="Items">{fmt(j["items"])}</td>'
@@ -561,14 +942,14 @@ def main() -> int:
     <div class="explore">
       <a href="catalog.html"><span class="label">Catalog</span>
         <span class="sub">Search all journals, or choose a journal, then a year and an issue.</span></a>
-      <a href="#journals"><span class="label">Journals</span>
-        <span class="sub">All {s["journals"]} journals with years, issues, and research and item counts.</span></a>
+      <a href="journals/index.html"><span class="label">Journals</span>
+        <span class="sub">Sort all {s["journals"]} journals, then open a journal’s years and issues.</span></a>
     </div>
 
     <h2 class="section-title" id="journals">Journals</h2>
     <div class="tbl-wrap">
       <table class="responsive">
-        <caption>{s["journals"]} journals. Counts are TOC items in the {s["window"].replace("-", "–")} freeze. A journal name opens its catalog.</caption>
+        <caption>{s["journals"]} journals. Counts are TOC items in the {s["window"].replace("-", "–")} freeze. A journal name opens that journal’s page. <a href="journals/index.html">Sort the full list</a>.</caption>
         <thead><tr><th scope="col">Journal</th><th scope="col">Publisher</th><th scope="col" class="num">Years</th>
           <th scope="col" class="num">Journal-years</th><th scope="col" class="num">Issues</th><th scope="col" class="num">Items</th>
           <th scope="col" class="num">Research</th><th scope="col" class="num">Other</th></tr></thead>
@@ -583,6 +964,26 @@ def main() -> int:
         page("Journal Articles — 49 core economics journals, 2010–2025",
              "Search and browse the core 49 economics journals, 2010–2025: titles, DOIs, item types, and author names by source.",
              "home", hub_body), encoding="utf-8")
+
+    # ---- Journals index and one page per journal -------------------------
+    (SITE / "journals").mkdir()
+    stamp = built_stamp(summary)
+    (SITE / "journals" / "index.html").write_text(
+        page("Journals — Journal Articles",
+             "All 49 core economics journals, 2010–2025, with publisher, years, and TOC counts.",
+             "journals", journals_index_body(jindex, journal_extra, summary),
+             canonical_path="journals/", rel="../",
+             scripts=f'  <script src="../journals.js?{ASSET_Q}"></script>'),
+        encoding="utf-8")
+    for j in jindex:
+        slug = j["slug"]
+        ex = journal_extra[slug]
+        (SITE / "journals" / f"{slug}.html").write_text(
+            page(f"{j['name']} — Journal Articles",
+                 f"{j['name']}, {j['year_start']}–{j['year_end']}: issues, TOC counts, and year-by-year coverage from the 2010–2025 freeze.",
+                 "", journal_page_body(j, ex, issues_by_j[slug], stamp),
+                 canonical_path=f"journals/{slug}.html", rel="../"),
+            encoding="utf-8")
 
     # ---- Catalog ----------------------------------------------------------
     cat_body = """    <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
@@ -618,7 +1019,7 @@ def main() -> int:
         <button type="button" class="btn" id="f-reset">Reset filters</button>
         <button type="button" class="btn" id="f-all" hidden>Search all journals</button>
       </div>
-      <p class="hint">Search all journals, or choose one to browse by year and issue. Research articles are the default. A result opens the issue and highlights the item. A DOI in this box opens that item when it is in this catalog, and says when it is not. A name in an issue list is labeled “Search for this name.” That searches the name string. It is not a page for one person. Previous and Next move between issues. Cite copies a citation and BibTeX.</p>
+      <p class="hint">Search all journals, or choose one in the journal box to browse by year and issue. In the list below, a journal name opens that journal’s page, and Browse opens its table of contents here. Research articles are the default. A result opens the issue and highlights the item. A DOI in this box opens that item when it is in this catalog, and says when it is not. A name in an issue list is labeled “Search for this name.” That searches the name string. It is not a page for one person. Previous and Next move between issues. Cite copies a citation and BibTeX.</p>
       <details class="hint">
         <summary>How author names are labelled</summary>
         <p><em>As printed in the TOC</em> means the publisher’s TOC. <em>OpenAlex</em>, <em>OpenAlex by DOI</em>, and <em>Crossref by DOI</em> mean names from those databases, used when the TOC had none. <em>Official article page</em> means the journal’s own article page. Items without names show none. Copy a DOI from the item. Cite uses the names, title, journal, year, volume, issue, pages, and DOI shown on that item. Choosing a name searches for that name string. The same display name is not one person.</p>
@@ -631,7 +1032,7 @@ def main() -> int:
         page("Catalog — Journal Articles",
              "Search titles and author names across 49 economics journals, or browse by journal, year, and issue.",
              "catalog", cat_body,
-             canonical_path="catalog.html", scripts='  <script src="catalog.js?v=6"></script>'),
+             canonical_path="catalog.html", scripts=f'  <script src="catalog.js?{ASSET_Q}"></script>'),
         encoding="utf-8")
 
     # ---- 404 (inline CSS so it styles at any depth) -----------------------
@@ -646,7 +1047,7 @@ def main() -> int:
     (function () {
       var m = location.pathname.match(/^\\/econ-journal-authors\\//);
       var base = m ? m[0] : "./";
-      document.querySelectorAll('a[href="./"], a[href="catalog.html"], a[href^="index.html"]').forEach(function (a) {
+      document.querySelectorAll('a[href="./"], a[href="catalog.html"], a[href^="index.html"], a[href^="journals/"]').forEach(function (a) {
         a.setAttribute("href", base + a.getAttribute("href").replace(/^\\.\\//, ""));
       });
     })();
@@ -675,6 +1076,8 @@ def main() -> int:
                     leaks.append(f"{p}: person_id")
                 if rel.startswith("data/search/") and "spine_id" in head:
                     leaks.append(f"{p}: spine_id")
+                if rel.startswith("data/") and any(tok in head for tok in ('"spine_id"', '"handoff"', "qs_")):
+                    leaks.append(f"{rel}: identifier leak")
     csv_cols = set()
     for n in ("journals.csv", "issues.csv", "coverage.csv", "authors_missing_by_journal_year.csv"):
         with open(SITE / "downloads" / n, newline="", encoding="utf-8") as f:
@@ -682,6 +1085,10 @@ def main() -> int:
     leaks += [c for c in csv_cols if any(f in c.lower() for f in FORBIDDEN)]
     if leaks:
         print("Forbidden content in site/:", leaks, file=sys.stderr)
+        return 1
+    page_problems = check_journal_pages(jindex, journal_extra, issues_by_j, issue_index)
+    if page_problems:
+        print("Journal page check failed:", page_problems[:12], file=sys.stderr)
         return 1
 
     total = sum(shard_sizes.values())
