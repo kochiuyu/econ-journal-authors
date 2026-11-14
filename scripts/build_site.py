@@ -498,7 +498,7 @@ def journal_page_body(j, ex, issues, stamp: str) -> str:
     issn = issn_phrase(ex["issn_l"], ex["issn"])
     slug = j["slug"]
     doi_gap = j["items"] - ex["items_with_doi"]
-    doi_sub = "Every item has a DOI" if doi_gap == 0 else f"{fmt(doi_gap)} TOC records without one"
+    doi_sub = "Every item has a DOI" if doi_gap == 0 else (f"{fmt(doi_gap)} TOC record without one" if doi_gap == 1 else f"{fmt(doi_gap)} TOC records without one")
     if ex["research_missing"] == 0:
         names_sub = f"{fmt(ex['research_with_authors'])} research with names. Every research article in this journal has names."
     else:
@@ -933,7 +933,7 @@ def main() -> int:
       <div class="stat"><div class="n">{fmt(s["research_articles"])}</div><div class="l">Research articles</div>
         <div class="sub">{fmt(s["other_items"])} other and proceedings items</div></div>
       <div class="stat"><div class="n">{fmt(s["items_with_doi"])}</div><div class="l">Items with a DOI</div>
-        <div class="sub">{"Every item has a DOI" if s["items"] == s["items_with_doi"] else fmt(s["items"] - s["items_with_doi"]) + " TOC records without one"}</div></div>
+        <div class="sub">{"Every item has a DOI" if s["items"] == s["items_with_doi"] else fmt(s["items"] - s["items_with_doi"]) + (" TOC record without one" if s["items"] - s["items_with_doi"] == 1 else " TOC records without one")}</div></div>
       <div class="stat"><div class="n">{fmt(s["research_with_authors"])}</div><div class="l">Research articles with names</div>
         <div class="sub">{fmt(s["items_with_authors"])} items with names: {fmt(src.get("spine", 0) + src.get("toc_official_qe", 0) + src.get("publisher_page", 0))} from the publisher, {fmt(src.get("openalex_via_registry", 0) + src.get("openalex", 0))} from OpenAlex, {fmt(src.get("crossref", 0))} from Crossref</div></div>
     </section>

@@ -37,8 +37,8 @@ from the displayed author names (the same string as on the page, including the b
 title, journal, year, volume, issue, pages, and DOI. Empty fields are omitted. Names are not rewritten.
 
 Freeze totals (from `summary.json`): 49 journals, 775 journal-years, 4,835 issues, 70,058 items,
-61,320 research articles, 8,738 other items, 69,869 with a DOI, 63,424 with author names
-(20,394 from the publisher, 42,908 from OpenAlex, 122 from Crossref), 61,320 research articles with names.
+61,316 research articles, 8,742 other items, 70,057 with a DOI, 63,424 with author names
+(20,395 from the publisher, 42,907 from OpenAlex, 122 from Crossref), 61,316 research articles with names.
 AER: Insights starts in 2019.
 
 ## What is not published
