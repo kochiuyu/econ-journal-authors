@@ -12,6 +12,14 @@
   --chip: #f7f3eb;
   --shadow: 0 10px 28px rgba(22, 48, 60, 0.06);
   --radius: 12px;
+  --bar-1: #1d4e63;
+  --bar-2: #1c4d38;
+  --bar-3: #5c5146;
+  --bar-4: #332e66;
+  --chart-ink: #1c1915;
+  --chart-muted: #5f584e;
+  --chart-line: #e3dace;
+  --panel-stroke: #fffcf7;
   --sans: "Source Sans 3", "Segoe UI", Helvetica, Arial, sans-serif;
   color-scheme: light;
   font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Noto Serif", serif;
@@ -28,6 +36,14 @@
     --accent-soft: #24343b;
     --chip: #2a2622;
     --shadow: none;
+    --bar-1: #8ec5d6;
+    --bar-2: #c9eadb;
+    --bar-3: #e6ddd4;
+    --bar-4: #ddd7f5;
+    --chart-ink: #f4efe6;
+    --chart-muted: #b7b0a4;
+    --chart-line: #3a342c;
+    --panel-stroke: #1e1c19;
     color-scheme: dark;
   }
 }
@@ -46,7 +62,8 @@ button, input, select { font: inherit; color: inherit; }
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%);
+  white-space: nowrap; border: 0; contain: strict;
 }
 .skip {
   position: absolute; left: 12px; top: -40px; background: var(--panel); color: var(--ink);
@@ -188,10 +205,54 @@ td .jname { font-weight: 650; }
 .year-card .sub { color: var(--muted); font-size: 13px; }
 .issue-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding: 0; list-style: none; }
 .issue-links a {
-  display: inline-block; font-size: 13px; padding: 2px 9px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; min-width: 44px; box-sizing: border-box;
+  font-size: 13px; padding: 8px 12px; border-radius: 999px;
   background: var(--chip); border: 1px solid var(--line); text-decoration: none;
 }
+.year-card h3 a {
+  display: inline-flex; align-items: center; min-height: 44px; min-width: 44px;
+  padding: 0 2px; box-sizing: border-box;
+}
 .issue-links a:hover { border-color: var(--accent); }
+.stats.compact { margin-top: 8px; }
+.stats.compact .stat { padding: 10px 12px 8px; }
+.stats.compact .stat .n { font-size: 22px; }
+.charts { display: flex; flex-direction: column; gap: 12px; margin: 8px 0 4px; max-width: 100%; }
+figure.chart {
+  margin: 0; max-width: 100%;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 12px 12px 14px; box-shadow: var(--shadow);
+}
+figure.chart svg { width: 100%; max-width: 640px; height: auto; display: block; }
+.chart-title {
+  display: block; font-family: var(--sans); font-size: 16px; font-weight: 700; line-height: 1.3;
+}
+.chart-note, .charts > .chart-note {
+  display: block; margin-top: 4px; color: var(--muted); font-family: var(--sans); font-size: 13.5px;
+}
+.charts > .chart-note { margin: 0; }
+.chart-summary { margin: 8px 0 0; color: var(--ink); font-family: var(--sans); font-size: 14.5px; }
+.legend {
+  display: flex; flex-wrap: wrap; gap: 6px 14px; list-style: none;
+  margin: 8px 0 0; padding: 0; font-family: var(--sans); font-size: 13px;
+}
+.legend li { display: inline-flex; align-items: center; }
+.swatch { width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; flex: 0 0 auto; }
+.swatch.s1 { background: var(--bar-1); }
+.swatch.s2 { background: var(--bar-2); }
+.swatch.s3 { background: var(--bar-3); }
+.swatch.s4 { background: var(--bar-4); }
+details.fold {
+  margin: 22px 0 8px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+details.fold > summary {
+  min-height: 44px; display: flex; align-items: center; padding: 8px 14px;
+  cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 18px;
+}
+details.fold .hint { margin: 0 14px 8px; }
+details.fold .tbl-wrap { border: 0; border-radius: 0; box-shadow: none; border-top: 1px solid var(--line); }
 
 /* Issue + items */
 .issue {

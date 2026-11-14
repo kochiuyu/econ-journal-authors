@@ -11,7 +11,9 @@ index for site-wide search. It uses the same display names as the shards.
 Also writes site/data/search/doi.json, a compact DOI-to-issue map.
 DOIs are lowercased. The file has no titles, names, or person ids.
 Also writes site/journals/index.html and site/journals/<slug>.html from the
-same freeze (counts, coverage, and issue links into the catalog).
+same freeze. Each journal page lists issues first, then inline SVG charts
+and the headline counts, then the year table. Chart totals are checked
+against journals.csv and coverage.csv.
 """
 from __future__ import annotations
 
@@ -26,11 +28,19 @@ from collections import Counter, OrderedDict
 from pathlib import Path
 from urllib.parse import quote, unquote
 
+from journal_charts import (
+    across_charts_html,
+    build_chart_series,
+    check_rendered_charts,
+    journal_charts_html,
+    spine_byline_names,
+)
+
 ROOT = Path(__file__).resolve().parent.parent
 FREEZE = ROOT / "releases" / "articles_toc_2010_2025"
 SRC = ROOT / "src"
 SITE = ROOT / "site"
-ASSET_Q = "v=7"
+ASSET_Q = "v=8"
 
 ARTICLE_SITE = "https://kochiuyu.github.io/econ-journal-authors/"
 ARTICLE_REPO = "https://github.com/kochiuyu/econ-journal-authors"
@@ -65,10 +75,10 @@ def display_authors(raw: str, source: str, stats: Counter) -> str:
         stats["authors_empty"] += 1
         return ""
     if source == "spine":
-        segs = [s.strip() for s in raw.split(";")]
-        if len(segs) >= 3 and " and " in segs[0] and all(s and s in segs[0] for s in segs[1:]):
+        hit = spine_byline_names(raw)
+        if hit is not None:
             stats["spine_byline_prefix"] += 1
-            return segs[0]
+            return hit[0]
         stats["spine_as_stored"] += 1
         return raw
     stats[f"{source}_as_stored"] += 1
@@ -341,7 +351,9 @@ ABOUT_HTML = """    <section class="prose" id="about" aria-labelledby="about-tit
         The repository is <a href="{repo}">kochiuyu/econ-journal-authors</a>.
         Searching all journals uses <code>data/search/</code>, a title-and-author index built from the same freeze, not the raw article table.
         DOI lookup uses <code>data/search/doi.json</code>, a location map from the same freeze.
-        Each journal has a page on <a href="journals/index.html">Journals</a>, with the counts, years, and issues in this freeze. A year or an issue on that page opens the catalog.
+        Each journal has a page on <a href="journals/index.html">Journals</a>. Issues come first.
+        Charts and the headline counts are below them, and the year-by-year table is at the end.
+        A year or an issue on that page opens the catalog.
       </p>
     </section>
 """
@@ -411,7 +423,7 @@ SORT_COLUMNS = [
 ]
 
 
-def journals_index_body(jindex, journal_extra, summary) -> str:
+def journals_index_body(jindex, journal_extra, summary, all_years) -> str:
     stamp = built_stamp(summary)
     options = "\n".join(
         f'        <option value="{esc(key)}">{esc(label)}</option>'
@@ -490,10 +502,10 @@ def journals_index_body(jindex, journal_extra, summary) -> str:
         </tbody>
       </table>
     </div>
-"""
+""" + across_charts_html(all_years)
 
 
-def journal_page_body(j, ex, issues, stamp: str) -> str:
+def journal_page_body(j, ex, issues, series, stamp: str) -> str:
     pub = PUBLISHER_LABEL.get(j["publisher"], j["publisher"])
     issn = issn_phrase(ex["issn_l"], ex["issn"])
     slug = j["slug"]
@@ -515,7 +527,7 @@ def journal_page_body(j, ex, issues, stamp: str) -> str:
             groups.append((iss[0], []))
         groups[-1][1].append(iss)
     cards = []
-    for year, lst in groups:
+    for year, lst in reversed(groups):
         tot = sum(i[4] for i in lst)
         res = sum(i[5] for i in lst)
         multi = len({i[1] for i in lst}) > 1
@@ -547,11 +559,22 @@ def journal_page_body(j, ex, issues, stamp: str) -> str:
             f'<td class="num" data-label="Items with names">{fmt(c["items_with_authors"])}</td>'
             f'<td class="num" data-label="Research with names">{fmt(m["with_authors"])}</td></tr>')
     browse = catalog_href("../", slug)
+    charts = journal_charts_html(slug, j["name"], series)
     return f"""    <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Journals</a> › {esc(j["name"])}</nav>
     <h1 class="page-title">{esc(j["name"])}</h1>
     <p class="intro">{esc(meta)} Counts are TOC items in the 2010–2025 freeze, built {esc(stamp)} (Asia/Hong_Kong).</p>
     <p class="page-actions"><a class="btn primary" href="{esc(browse)}">Browse this journal</a></p>
-    <section class="stats" aria-label="{esc(j["name"])} totals">
+
+    <h2 class="section-title">Issues</h2>
+    <p class="hint">Each issue opens in the catalog. The label is the TOC issue; a volume prefix appears when a year has more than one volume. Elsevier continuous-publication volumes use issue “C”. Years are newest first.</p>
+    <div class="years">
+{chr(10).join(cards)}
+    </div>
+
+    <h2 class="section-title" id="statistics">Statistics</h2>
+    <p class="hint">Counted from this journal’s rows in the 2010–2025 freeze. Nothing in the charts is estimated.</p>
+{charts}
+    <section class="stats compact" aria-label="{esc(j["name"])} totals">
       <div class="stat"><div class="n">{fmt(j["issues"])}</div><div class="l">Issues</div>
         <div class="sub">{esc(f'{j["year_start"]}–{j["year_end"]}')}</div></div>
       <div class="stat"><div class="n">{fmt(j["items"])}</div><div class="l">TOC items</div>
@@ -561,26 +584,22 @@ def journal_page_body(j, ex, issues, stamp: str) -> str:
       <div class="stat"><div class="n">{fmt(ex["items_with_authors"])}</div><div class="l">Items with names</div>
         <div class="sub">{names_sub}</div></div>
     </section>
-    <p class="hint">Research-article names: {fmt(ex["from_publisher"])} from the publisher, {fmt(ex["from_openalex"])} from OpenAlex, {fmt(ex["from_crossref"])} from Crossref. Names are shown on each catalog item, with their source.</p>
 
-    <h2 class="section-title">Coverage by year</h2>
-    <div class="tbl-wrap">
-      <table class="responsive">
-        <caption>One row per year in the freeze. A year opens that year in the catalog.</caption>
-        <thead><tr><th scope="col">Year</th><th scope="col" class="num">Issues</th><th scope="col" class="num">Items</th>
-          <th scope="col" class="num">Research</th><th scope="col" class="num">Other</th><th scope="col" class="num">With a DOI</th>
-          <th scope="col" class="num">With names</th><th scope="col" class="num">Research with names</th></tr></thead>
-        <tbody>
+    <details class="fold">
+      <summary>Coverage by year</summary>
+      <p class="hint">One row per year in the freeze. A year opens that year in the catalog.</p>
+      <div class="tbl-wrap">
+        <table class="responsive">
+          <caption>One row per year in the freeze. A year opens that year in the catalog.</caption>
+          <thead><tr><th scope="col">Year</th><th scope="col" class="num">Issues</th><th scope="col" class="num">Items</th>
+            <th scope="col" class="num">Research</th><th scope="col" class="num">Other</th><th scope="col" class="num">With a DOI</th>
+            <th scope="col" class="num">With names</th><th scope="col" class="num">Research with names</th></tr></thead>
+          <tbody>
 {chr(10).join(cov_rows)}
-        </tbody>
-      </table>
-    </div>
-
-    <h2 class="section-title">Issues</h2>
-    <p class="hint">Each issue opens in the catalog. The label is the TOC issue; a volume prefix appears when a year has more than one volume. Elsevier continuous-publication volumes use issue “C”.</p>
-    <div class="years">
-{chr(10).join(cards)}
-    </div>
+          </tbody>
+        </table>
+      </div>
+    </details>
 """
 
 
@@ -623,6 +642,17 @@ def check_journal_pages(jindex, journal_extra, issues_by_j, issue_index) -> list
         if re.search(r'(?:href|src)="/', text):
             problems.append(f"{slug} root-absolute URL")
         ex = journal_extra[slug]
+        gap = j["items"] - ex["items_with_doi"]
+        if gap == 0:
+            if "Every item has a DOI" not in text:
+                problems.append(f"{slug} missing every-item DOI line")
+        elif gap == 1:
+            if "1 TOC record without one" not in text or "1 TOC records without one" in text:
+                problems.append(f"{slug} DOI singular wording")
+        else:
+            phrase = f"{fmt(gap)} TOC records without one"
+            if phrase not in text:
+                problems.append(f"{slug} DOI gap wording")
         for c in ex["coverage"]:
             if esc(catalog_href("../", slug, c["year"])) not in text:
                 problems.append(f"{slug} missing year {c['year']}")
@@ -700,6 +730,12 @@ def main() -> int:
             bad["authors_source_mismatch"] += 1
     if bad:
         print("Freeze does not match summary.json:", bad, file=sys.stderr)
+        return 1
+
+    series_by_slug, all_years, series_problems = build_chart_series(
+        articles, journals, coverage, missing, summary)
+    if series_problems:
+        print("Chart series check failed:", series_problems[:12], file=sys.stderr)
         return 1
 
     # ---- Fresh output dir -------------------------------------------------
@@ -784,6 +820,11 @@ def main() -> int:
         }
         if ex["from_publisher"] + ex["from_openalex"] + ex["from_crossref"] != ex["research_with_authors"]:
             print(f"Research name sources do not add up for {slug}", file=sys.stderr)
+            return 1
+        got = series_by_slug[slug]["sources"]
+        if (got["publisher"], got["openalex"], got["crossref"]) != (
+                ex["from_publisher"], ex["from_openalex"], ex["from_crossref"]):
+            print(f"Chart name sources do not match the coverage grouping for {slug}", file=sys.stderr)
             return 1
         if sum_int(cov, "items") != int(j["items"]) or sum_int(cov, "issues") != int(j["issues"]):
             print(f"Coverage totals do not match journals.csv for {slug}", file=sys.stderr)
@@ -970,8 +1011,8 @@ def main() -> int:
     stamp = built_stamp(summary)
     (SITE / "journals" / "index.html").write_text(
         page("Journals — Journal Articles",
-             "All 49 core economics journals, 2010–2025, with publisher, years, and TOC counts.",
-             "journals", journals_index_body(jindex, journal_extra, summary),
+             "All 49 core economics journals, 2010–2025, with publisher, years, TOC counts, and charts across journals.",
+             "journals", journals_index_body(jindex, journal_extra, summary, all_years),
              canonical_path="journals/", rel="../",
              scripts=f'  <script src="../journals.js?{ASSET_Q}"></script>'),
         encoding="utf-8")
@@ -980,8 +1021,8 @@ def main() -> int:
         ex = journal_extra[slug]
         (SITE / "journals" / f"{slug}.html").write_text(
             page(f"{j['name']} — Journal Articles",
-                 f"{j['name']}, {j['year_start']}–{j['year_end']}: issues, TOC counts, and year-by-year coverage from the 2010–2025 freeze.",
-                 "", journal_page_body(j, ex, issues_by_j[slug], stamp),
+                 f"{j['name']}, {j['year_start']}–{j['year_end']}: issues first, then charts from the 2010–2025 freeze.",
+                 "", journal_page_body(j, ex, issues_by_j[slug], series_by_slug[slug], stamp),
                  canonical_path=f"journals/{slug}.html", rel="../"),
             encoding="utf-8")
 
@@ -1087,6 +1128,7 @@ def main() -> int:
         print("Forbidden content in site/:", leaks, file=sys.stderr)
         return 1
     page_problems = check_journal_pages(jindex, journal_extra, issues_by_j, issue_index)
+    page_problems += check_rendered_charts(SITE, jindex, series_by_slug, all_years, summary)
     if page_problems:
         print("Journal page check failed:", page_problems[:12], file=sys.stderr)
         return 1
