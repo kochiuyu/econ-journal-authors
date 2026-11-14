@@ -1092,7 +1092,7 @@
     setTypeCounts(null);
     els.results.appendChild(el("p", {
       class: "empty",
-      text: doi + " is not in the 2012–2025 catalog. Nothing was added from outside this release."
+      text: doi + " is not in the 2010–2025 catalog. Nothing was added from outside this release."
     }));
   }
 

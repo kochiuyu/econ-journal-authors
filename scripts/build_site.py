@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the Journal Articles static site from the public TOC freeze.
 
-Only input: releases/articles_toc_2012_2025/ (articles.csv, issues.csv,
+Only input: releases/articles_toc_2010_2025/ (articles.csv, issues.csv,
 journals.csv, coverage.csv, summary.json, README.md).
 Output: site/ (static GitHub Pages site, relative asset paths only).
 
@@ -23,7 +23,7 @@ from collections import Counter, OrderedDict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FREEZE = ROOT / "releases" / "articles_toc_2012_2025"
+FREEZE = ROOT / "releases" / "articles_toc_2010_2025"
 SRC = ROOT / "src"
 SITE = ROOT / "site"
 
@@ -268,7 +268,7 @@ def page(title, description, active, body, canonical_path="", extra_head="", scr
         <span class="logo" aria-hidden="true">Ja</span>
         <span>
           <span class="t1">Journal Articles</span>
-          <span class="t2">49 core economics journals · 2012–2025</span>
+          <span class="t2">49 core economics journals · 2010–2025</span>
         </span>
       </a>
       <nav class="nav" aria-label="Site">
@@ -283,7 +283,7 @@ def page(title, description, active, body, canonical_path="", extra_head="", scr
 
   <footer class="footer wrap">
     <p>
-      Article catalog · TOC freeze <code>articles_toc_2012_2025</code>.
+      Article catalog · TOC freeze <code>articles_toc_2010_2025</code>.
       Repository: <a href="{ARTICLE_REPO}">kochiuyu/econ-journal-authors</a>.
       Compiled catalog, site, and documentation: <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a>.
       Titles and bylines remain the publishers’.
@@ -326,7 +326,7 @@ ABOUT_HTML = """    <section class="prose" id="about" aria-labelledby="about-tit
         Article titles, author bylines, and publisher tables of contents remain the publishers’.
       </p>
       <p class="small">
-        Built {built} (Asia/Taipei) from <code>releases/articles_toc_2012_2025/</code> with
+        Built {built} (Asia/Hong_Kong) from <code>releases/articles_toc_2010_2025/</code> with
         <code>python scripts/build_site.py</code>. Journal-level tables are under <a href="downloads/">downloads</a>
         (<a href="downloads/journals.csv">journals.csv</a>, <a href="downloads/issues.csv">issues.csv</a>,
         <a href="downloads/coverage.csv">coverage.csv</a>, <a href="downloads/authors_missing_by_journal_year.csv">authors_missing_by_journal_year.csv</a>, <a href="downloads/summary.json">summary.json</a>).
@@ -495,7 +495,7 @@ def main() -> int:
         page("Downloads — Journal Articles", "Journal-level tables from the TOC freeze.", "",
              f"""    <h1 class="page-title">Downloads</h1>
     <section class="prose">
-    <p>Journal-, issue-, and year-level tables from the <code>articles_toc_2012_2025</code> freeze.
+    <p>Journal-, issue-, and year-level tables from the <code>articles_toc_2010_2025</code> freeze.
     The article-level data is in the per-journal files under <a href="../data/journals/">data/journals/</a>
     used by the <a href="../catalog.html">catalog</a>.</p>
     <ul>
@@ -528,11 +528,11 @@ def main() -> int:
             f'<td class="num" data-label="Issues">{fmt(j["issues"])}</td><td class="num" data-label="Items">{fmt(j["items"])}</td>'
             f'<td class="num" data-label="Research">{fmt(j["research"])}</td>'
             f'<td class="num" data-label="Other">{fmt(j["other"])}</td></tr>')
-    hub_body = f"""    <h1 class="sr-only">Journal Articles — 49 core economics journals, 2012–2025</h1>
+    hub_body = f"""    <h1 class="sr-only">Journal Articles — 49 core economics journals, 2010–2025</h1>
     <p class="intro">
       The publisher tables of contents for 49 core economics journals,
-      2012–2025. Search titles and author names across every journal, or browse by journal, then by year and issue. Each item has its title, DOI, item type, and author names with their source.
-      AER: Insights starts in 2019, so 2012–2018 have 48 journals.
+      2010–2025. Search titles and author names across every journal, or browse by journal, then by year and issue. Each item has its title, DOI, item type, and author names with their source.
+      AER: Insights starts in 2019, so 2010–2018 have 48 journals.
       This release has no person registry: names come from the TOC, the journal’s article pages, OpenAlex, or Crossref (names only).
     </p>
 
@@ -580,8 +580,8 @@ def main() -> int:
 
 {about}"""
     (SITE / "index.html").write_text(
-        page("Journal Articles — 49 core economics journals, 2012–2025",
-             "Search and browse the core 49 economics journals, 2012–2025: titles, DOIs, item types, and author names by source.",
+        page("Journal Articles — 49 core economics journals, 2010–2025",
+             "Search and browse the core 49 economics journals, 2010–2025: titles, DOIs, item types, and author names by source.",
              "home", hub_body), encoding="utf-8")
 
     # ---- Catalog ----------------------------------------------------------

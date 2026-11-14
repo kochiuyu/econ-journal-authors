@@ -1,7 +1,7 @@
 # econ-journal-authors — Journal Articles
 
 Public static site and GitHub repo for the **article catalog**:
-the publisher tables of contents (TOC) for 49 core economics journals, 2012–2025.
+the publisher tables of contents (TOC) for 49 core economics journals, 2010–2025.
 
 - Repo: <https://github.com/kochiuyu/econ-journal-authors>
 - Site (GitHub Pages, project base `/econ-journal-authors/`): <https://kochiuyu.github.io/econ-journal-authors/>
@@ -11,7 +11,7 @@ the publisher tables of contents (TOC) for 49 core economics journals, 2012–20
 You can search titles and author names across all 49 journals, or browse by journal, then year, then issue. Each TOC item shows:
 
 - title, pages, volume/issue, and a link to the issue TOC (and the publisher page when the freeze has one);
-- DOI linked to `https://doi.org/{doi}` (every item in this freeze has a DOI);
+- DOI linked to `https://doi.org/{doi}` (189 items from 2010–2011 have no DOI in the TOC, and the catalog says so);
 - type: **Research article** (`article_type=article`, `is_research=1`), **Other**, or **Proceedings** (`is_research=0`).
   The catalog and site-wide search show research articles first. A filter chip includes other and proceedings items, or all items.
 - author names exactly as recorded, always labelled by source:
@@ -29,16 +29,16 @@ Spine rows stored as a printed byline followed by the individual names
 On an issue, **Previous** and **Next** open the adjacent issue of that journal in catalog order
 (year, then volume, then issue, so numeric issues such as 1, 2, … 10 come before labels such as S1;
 Elsevier continuous volumes stay issue “C”). The step crosses a year or volume when that is the next
-catalog issue. The first and last issue in the 2012–2025 window has the empty direction disabled.
+catalog issue. The first and last issue in the 2010–2025 window has the empty direction disabled.
 The move updates `year`, `volume`, and `issue` only. A highlighted `item` does not carry over.
 
 Each TOC item has **Cite**. It copies a plain-text journal citation and a BibTeX `@article` record
 from the displayed author names (the same string as on the page, including the byline-prefix rule),
 title, journal, year, volume, issue, pages, and DOI. Empty fields are omitted. Names are not rewritten.
 
-Freeze totals (from `summary.json`): 49 journals, 679 journal-years, 4,283 issues, 62,936 items,
-55,440 research articles, 7,496 other items, 62,936 with a DOI, 56,825 with author names
-(15,465 from the publisher, 41,238 from OpenAlex, 122 from Crossref), 55,440 research articles with names.
+Freeze totals (from `summary.json`): 49 journals, 775 journal-years, 4,835 issues, 70,058 items,
+61,320 research articles, 8,738 other items, 69,869 with a DOI, 63,424 with author names
+(20,394 from the publisher, 42,908 from OpenAlex, 122 from Crossref), 61,320 research articles with names.
 AER: Insights starts in 2019.
 
 ## What is not published
@@ -49,9 +49,9 @@ author pages are planned for later releases.
 
 ## Source
 
-The only input is the frozen release `releases/articles_toc_2012_2025/`
+The only input is the frozen release `releases/articles_toc_2010_2025/`
 (`articles.csv`, `issues.csv`, `journals.csv`, `coverage.csv`, `summary.json`, `README.md`),
-built 2026-11-12 13:55 (Asia/Taipei). This supersedes the 2026-11-12 13:37 freeze. Nothing is read from the collector workspace.
+built 2026-11-14 14:13 (Asia/Hong_Kong). It adds 2010–2011 and supersedes the 2012–2025 freeze of 2026-11-12 13:55; every 2012–2025 row is unchanged. Nothing is read from the collector workspace.
 
 ## Layout
 
@@ -80,7 +80,7 @@ Catalog URLs:
 - `catalog.html?journal=aej-applied-economics&year=2015&volume=7&issue=1&item=2` opens that issue and highlights the item. `item` is the 0-based position in the issue’s TOC order, not a public identifier.
 - Previous and Next on that issue go to the neighboring issues in the same order the year page lists them. No extra query parameter is added.
 - On an issue, each displayed author name is a link labeled “Search for this name.” It opens a site-wide search for that name string only. The same display name is not one person, and there is no author page.
-- A DOI in either search box — `10.…`, `https://doi.org/…`, or `http://dx.doi.org/…`, with case and surrounding whitespace ignored — opens that issue and highlights the item when the DOI is in this catalog. If it is not, the catalog says the DOI is not in the 2012–2025 release and does not add a record.
+- A DOI in either search box — `10.…`, `https://doi.org/…`, or `http://dx.doi.org/…`, with case and surrounding whitespace ignored — opens that issue and highlights the item when the DOI is in this catalog. If it is not, the catalog says the DOI is not in the 2010–2025 release and does not add a record.
 
 The search index is built from the freeze only. It stores the same display names as the catalog, including the TOC byline-prefix rule, and it does not include `articles.csv`. The first site-wide search shows a loading state while `research.json` downloads; other and proceedings items download if you include them. DOI lookup uses `data/search/doi.json` (lowercased DOI, journal, year, volume, issue, and TOC position only) and loads that file only when the query is a DOI. GitHub Pages gzips those files.
 
