@@ -64,7 +64,7 @@ site/                   generated; this is what GitHub Pages serves
   index.html            hub: search, counts, 49-journal table, About
   catalog.html          search and browse (?journal=&year=&volume=&issue=&type=&q=&item=)
   journals/index.html   all 49 journals, sortable
-  journals/<slug>.html  one page per journal: counts, coverage, issues
+  journals/<slug>.html  one page per journal: issues, then charts and counts
   data/journals.json    small index (meta + per-journal coverage)
   data/journals/<slug>.json   one lean shard per journal, loaded on demand
   data/search/research.json   titles and display names for research articles
@@ -79,7 +79,7 @@ Catalog URLs:
 - The homepage search box submits to `catalog.html?q=…`. The same box is on the catalog page, and the query stays in the URL.
 - `catalog.html?q=Duflo` searches titles and author names in all 49 journals (research articles unless `type=other` or `type=all`). No journal has to be selected first.
 - `journals/index.html` lists all 49 journals and sorts by name, publisher, years, journal-years, issues, items, research, other, items with a DOI, items with names, and research articles with names. Those counts come from `journals.csv`, `coverage.csv`, and `authors_missing_by_journal_year.csv`.
-- `journals/<slug>.html` is one journal: display name, publisher, ISSN, years covered (AER: Insights starts in 2019; the others run 2010–2025), issue and item counts, items with a DOI, items and research articles with names, a year-by-year coverage table, and the issues in the freeze. A year or issue opens `catalog.html?journal=&year=&volume=&issue=`.
+- `journals/<slug>.html` is one journal: display name, publisher, ISSN, and years covered (AER: Insights starts in 2019; the others run 2010–2025). Issues come first, newest year first. A year or issue opens `catalog.html?journal=&year=&volume=&issue=`. Below the issues, inline SVG charts show research and other items per year, average names per research article, the share with 1, 2, 3, or 4 or more names, average page length when a numeric page range exists, and where research-article names came from. The headline counts sit under the charts. The year-by-year table is last, inside a disclosure. `journals/index.html` adds the same kind of charts for all journals under the sortable table.
 - A journal name on the homepage, the journals index, and the catalog list opens that journal page. Browse in the catalog, and the year and issue links on the journal page, still open the catalog viewer.
 - `catalog.html?journal=aer`, `catalog.html?journal=aer&year=2018`, `catalog.html?journal=aer&year=2018&volume=108&issue=1` browse as before.
 - `catalog.html?journal=aer&q=wage` still searches only inside the loaded journal.
