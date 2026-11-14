@@ -1,4 +1,6 @@
 journal_slug,journal,year,issues,items,research_articles,other_items,items_with_doi,items_with_authors
+aej-applied-economics,AEJ: Applied Economics,2010,4,44,40,4,44,40
+aej-applied-economics,AEJ: Applied Economics,2011,4,41,36,5,41,37
 aej-applied-economics,AEJ: Applied Economics,2012,4,44,40,4,44,40
 aej-applied-economics,AEJ: Applied Economics,2013,4,42,37,5,42,38
 aej-applied-economics,AEJ: Applied Economics,2014,4,44,40,4,44,40
@@ -13,6 +15,8 @@ aej-applied-economics,AEJ: Applied Economics,2022,4,63,55,8,63,59
 aej-applied-economics,AEJ: Applied Economics,2023,4,60,56,4,60,56
 aej-applied-economics,AEJ: Applied Economics,2024,4,68,64,4,68,64
 aej-applied-economics,AEJ: Applied Economics,2025,4,48,44,4,48,44
+aej-economic-policy,AEJ: Economic Policy,2010,4,35,31,4,35,32
+aej-economic-policy,AEJ: Economic Policy,2011,4,34,30,4,34,30
 aej-economic-policy,AEJ: Economic Policy,2012,4,41,36,5,41,37
 aej-economic-policy,AEJ: Economic Policy,2013,4,47,42,5,47,43
 aej-economic-policy,AEJ: Economic Policy,2014,4,49,44,5,49,45
@@ -27,6 +31,8 @@ aej-economic-policy,AEJ: Economic Policy,2022,4,68,63,5,68,64
 aej-economic-policy,AEJ: Economic Policy,2023,4,68,64,4,68,64
 aej-economic-policy,AEJ: Economic Policy,2024,4,68,64,4,68,64
 aej-economic-policy,AEJ: Economic Policy,2025,4,65,61,4,65,61
+aej-macroeconomics,AEJ: Macroeconomics,2010,4,42,36,6,42,38
+aej-macroeconomics,AEJ: Macroeconomics,2011,4,36,32,4,36,32
 aej-macroeconomics,AEJ: Macroeconomics,2012,4,35,30,5,35,31
 aej-macroeconomics,AEJ: Macroeconomics,2013,4,33,29,4,33,29
 aej-macroeconomics,AEJ: Macroeconomics,2014,4,35,31,4,35,31
@@ -41,6 +47,8 @@ aej-macroeconomics,AEJ: Macroeconomics,2022,4,58,54,4,58,54
 aej-macroeconomics,AEJ: Macroeconomics,2023,4,59,55,4,59,55
 aej-macroeconomics,AEJ: Macroeconomics,2024,4,54,50,4,54,50
 aej-macroeconomics,AEJ: Macroeconomics,2025,4,47,43,4,47,43
+aej-microeconomics,AEJ: Microeconomics,2010,4,37,33,4,37,33
+aej-microeconomics,AEJ: Microeconomics,2011,4,42,36,6,42,38
 aej-microeconomics,AEJ: Microeconomics,2012,4,36,31,5,36,32
 aej-microeconomics,AEJ: Microeconomics,2013,4,38,34,4,38,34
 aej-microeconomics,AEJ: Microeconomics,2014,4,48,44,4,48,44
@@ -55,6 +63,8 @@ aej-microeconomics,AEJ: Microeconomics,2022,4,86,81,5,86,82
 aej-microeconomics,AEJ: Microeconomics,2023,4,70,66,4,70,66
 aej-microeconomics,AEJ: Microeconomics,2024,4,56,52,4,56,52
 aej-microeconomics,AEJ: Microeconomics,2025,4,52,48,4,52,48
+aer,AER,2010,5,253,95,158,253,246
+aer,AER,2011,7,278,120,158,278,270
 aer,AER,2012,7,274,263,11,274,266
 aer,AER,2013,7,255,245,10,255,247
 aer,AER,2014,12,284,148,136,284,253
@@ -76,6 +86,8 @@ aer-insights,AER: Insights,2022,4,36,32,4,36,32
 aer-insights,AER: Insights,2023,4,38,34,4,38,34
 aer-insights,AER: Insights,2024,4,38,34,4,38,34
 aer-insights,AER: Insights,2025,4,36,32,4,36,32
+american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2010,5,136,94,42,136,114
+american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2011,5,175,99,76,175,139
 american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2012,5,153,96,57,153,96
 american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2013,5,160,113,47,160,113
 american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2014,5,121,85,36,121,85
@@ -90,6 +102,8 @@ american-journal-of-agricultural-economics,American Journal of Agricultural Econ
 american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2023,5,75,61,14,75,61
 american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2024,5,83,67,16,83,67
 american-journal-of-agricultural-economics,American Journal of Agricultural Economics,2025,5,71,56,15,71,56
+econometric-theory,Econometric Theory,2010,6,82,66,16,82,67
+econometric-theory,Econometric Theory,2011,6,64,43,21,64,50
 econometric-theory,Econometric Theory,2012,6,67,18,49,67,53
 econometric-theory,Econometric Theory,2013,6,59,31,28,59,45
 econometric-theory,Econometric Theory,2014,6,56,42,14,56,43
@@ -104,6 +118,8 @@ econometric-theory,Econometric Theory,2022,6,51,36,15,51,39
 econometric-theory,Econometric Theory,2023,6,53,36,17,53,41
 econometric-theory,Econometric Theory,2024,6,39,37,2,39,39
 econometric-theory,Econometric Theory,2025,6,45,41,4,45,45
+econometrica,Econometrica,2010,6,101,64,37,101,67
+econometrica,Econometrica,2011,6,82,48,34,82,53
 econometrica,Econometrica,2012,6,109,76,33,109,78
 econometrica,Econometrica,2013,6,93,65,28,93,68
 econometrica,Econometrica,2014,6,89,60,29,89,62
@@ -118,6 +134,8 @@ econometrica,Econometrica,2022,6,120,84,36,120,84
 econometrica,Econometrica,2023,6,106,66,40,106,66
 econometrica,Econometrica,2024,6,94,59,35,94,59
 econometrica,Econometrica,2025,6,94,61,33,94,61
+economic-theory,Economic Theory,2010,11,82,80,2,82,82
+economic-theory,Economic Theory,2011,7,60,59,1,60,59
 economic-theory,Economic Theory,2012,9,91,91,0,91,91
 economic-theory,Economic Theory,2013,9,97,97,0,97,97
 economic-theory,Economic Theory,2014,9,73,73,0,73,73
@@ -132,6 +150,8 @@ economic-theory,Economic Theory,2022,7,81,77,4,81,81
 economic-theory,Economic Theory,2023,8,81,80,1,81,81
 economic-theory,Economic Theory,2024,7,76,75,1,76,76
 economic-theory,Economic Theory,2025,8,79,78,1,79,79
+energy-economics,Energy Economics,2010,7,180,166,14,180,173
+energy-economics,Energy Economics,2011,7,155,135,20,155,148
 energy-economics,Energy Economics,2012,9,283,272,11,283,272
 energy-economics,Energy Economics,2013,7,271,259,12,271,259
 energy-economics,Energy Economics,2014,7,250,241,9,250,241
@@ -146,6 +166,8 @@ energy-economics,Energy Economics,2022,12,578,558,20,578,558
 energy-economics,Energy Economics,2023,13,650,625,25,650,625
 energy-economics,Energy Economics,2024,12,746,720,26,746,720
 energy-economics,Energy Economics,2025,12,894,837,57,894,837
+european-economic-review,European Economic Review,2010,8,72,63,9,72,64
+european-economic-review,European Economic Review,2011,8,80,70,10,80,72
 european-economic-review,European Economic Review,2012,8,117,102,15,117,102
 european-economic-review,European Economic Review,2013,8,113,102,11,113,102
 european-economic-review,European Economic Review,2014,8,128,118,10,128,118
@@ -160,6 +182,8 @@ european-economic-review,European Economic Review,2022,10,168,157,11,168,157
 european-economic-review,European Economic Review,2023,10,227,204,23,227,204
 european-economic-review,European Economic Review,2024,10,191,176,15,191,176
 european-economic-review,European Economic Review,2025,10,200,181,19,200,181
+experimental-economics,Experimental Economics,2010,4,27,27,0,27,27
+experimental-economics,Experimental Economics,2011,4,31,31,0,31,31
 experimental-economics,Experimental Economics,2012,4,37,37,0,37,37
 experimental-economics,Experimental Economics,2013,4,32,31,1,32,32
 experimental-economics,Experimental Economics,2014,4,36,36,0,36,36
@@ -174,6 +198,8 @@ experimental-economics,Experimental Economics,2022,5,54,51,3,54,54
 experimental-economics,Experimental Economics,2023,5,45,40,5,45,45
 experimental-economics,Experimental Economics,2024,5,46,42,4,46,46
 experimental-economics,Experimental Economics,2025,6,61,60,1,61,61
+games-and-economic-behavior,Games and Economic Behavior,2010,6,142,122,20,142,127
+games-and-economic-behavior,Games and Economic Behavior,2011,6,137,117,20,137,124
 games-and-economic-behavior,Games and Economic Behavior,2012,6,181,165,16,181,165
 games-and-economic-behavior,Games and Economic Behavior,2013,6,134,120,14,134,120
 games-and-economic-behavior,Games and Economic Behavior,2014,6,161,143,18,161,143
@@ -188,6 +214,8 @@ games-and-economic-behavior,Games and Economic Behavior,2022,6,159,144,15,159,14
 games-and-economic-behavior,Games and Economic Behavior,2023,6,170,155,15,170,155
 games-and-economic-behavior,Games and Economic Behavior,2024,6,152,139,13,152,139
 games-and-economic-behavior,Games and Economic Behavior,2025,6,148,134,14,148,134
+health-economics,Health Economics,2010,13,119,104,15,119,115
+health-economics,Health Economics,2011,13,117,107,10,117,115
 health-economics,Health Economics,2012,14,132,120,12,132,120
 health-economics,Health Economics,2013,12,108,98,10,108,98
 health-economics,Health Economics,2014,12,105,95,10,105,95
@@ -202,6 +230,8 @@ health-economics,Health Economics,2022,14,173,155,18,173,155
 health-economics,Health Economics,2023,12,147,134,13,147,134
 health-economics,Health Economics,2024,12,139,127,12,139,127
 health-economics,Health Economics,2025,12,133,120,13,133,120
+international-economic-review,International Economic Review,2010,4,48,48,0,48,48
+international-economic-review,International Economic Review,2011,4,51,51,0,51,51
 international-economic-review,International Economic Review,2012,4,55,55,0,55,55
 international-economic-review,International Economic Review,2013,4,53,50,3,53,51
 international-economic-review,International Economic Review,2014,4,52,50,2,52,50
@@ -216,6 +246,8 @@ international-economic-review,International Economic Review,2022,4,61,55,6,61,55
 international-economic-review,International Economic Review,2023,4,63,57,6,63,57
 international-economic-review,International Economic Review,2024,4,67,62,5,67,62
 international-economic-review,International Economic Review,2025,5,83,70,13,83,70
+journal-of-applied-econometrics,Journal of Applied Econometrics,2010,7,55,48,7,55,53
+journal-of-applied-econometrics,Journal of Applied Econometrics,2011,7,59,52,7,59,57
 journal-of-applied-econometrics,Journal of Applied Econometrics,2012,7,59,56,3,59,56
 journal-of-applied-econometrics,Journal of Applied Econometrics,2013,7,58,55,3,58,55
 journal-of-applied-econometrics,Journal of Applied Econometrics,2014,7,62,61,1,62,61
@@ -230,6 +262,8 @@ journal-of-applied-econometrics,Journal of Applied Econometrics,2022,7,79,69,10,
 journal-of-applied-econometrics,Journal of Applied Econometrics,2023,7,70,60,10,70,60
 journal-of-applied-econometrics,Journal of Applied Econometrics,2024,7,87,79,8,87,79
 journal-of-applied-econometrics,Journal of Applied Econometrics,2025,7,62,54,8,62,54
+journal-of-business-and-economic-statistics,Journal of Business and Economic Statistics,2010,4,44,40,4,44,41
+journal-of-business-and-economic-statistics,Journal of Business and Economic Statistics,2011,4,52,48,4,52,49
 journal-of-business-and-economic-statistics,Journal of Business and Economic Statistics,2012,4,55,46,9,55,46
 journal-of-business-and-economic-statistics,Journal of Business and Economic Statistics,2013,4,48,37,11,48,37
 journal-of-business-and-economic-statistics,Journal of Business and Economic Statistics,2014,4,60,34,26,60,34
@@ -244,6 +278,8 @@ journal-of-business-and-economic-statistics,Journal of Business and Economic Sta
 journal-of-business-and-economic-statistics,Journal of Business and Economic Statistics,2023,4,109,103,6,109,103
 journal-of-business-and-economic-statistics,Journal of Business and Economic Statistics,2024,4,108,101,7,108,101
 journal-of-business-and-economic-statistics,Journal of Business and Economic Statistics,2025,4,92,88,4,92,88
+journal-of-development-economics,Journal of Development Economics,2010,6,79,73,6,79,73
+journal-of-development-economics,Journal of Development Economics,2011,6,87,80,7,87,81
 journal-of-development-economics,Journal of Development Economics,2012,6,112,105,7,112,105
 journal-of-development-economics,Journal of Development Economics,2013,6,117,108,9,117,108
 journal-of-development-economics,Journal of Development Economics,2014,6,126,119,7,126,119
@@ -258,6 +294,8 @@ journal-of-development-economics,Journal of Development Economics,2022,6,124,116
 journal-of-development-economics,Journal of Development Economics,2023,6,157,150,7,157,150
 journal-of-development-economics,Journal of Development Economics,2024,6,157,148,9,157,148
 journal-of-development-economics,Journal of Development Economics,2025,6,162,154,8,162,154
+journal-of-econometrics,Journal of Econometrics,2010,12,158,138,20,158,145
+journal-of-econometrics,Journal of Econometrics,2011,12,160,140,20,160,147
 journal-of-econometrics,Journal of Econometrics,2012,12,192,167,25,192,167
 journal-of-econometrics,Journal of Econometrics,2013,12,113,95,18,113,95
 journal-of-econometrics,Journal of Econometrics,2014,14,171,145,26,171,145
@@ -272,6 +310,8 @@ journal-of-econometrics,Journal of Econometrics,2022,12,153,132,21,153,132
 journal-of-econometrics,Journal of Econometrics,2023,15,289,256,33,289,256
 journal-of-econometrics,Journal of Econometrics,2024,15,244,223,21,244,223
 journal-of-econometrics,Journal of Econometrics,2025,9,174,161,13,174,161
+journal-of-economic-behavior-and-organization,Journal of Economic Behavior and Organization,2010,11,167,153,14,167,166
+journal-of-economic-behavior-and-organization,Journal of Economic Behavior and Organization,2011,10,147,134,13,147,147
 journal-of-economic-behavior-and-organization,Journal of Economic Behavior and Organization,2012,11,211,206,5,211,206
 journal-of-economic-behavior-and-organization,Journal of Economic Behavior and Organization,2013,13,239,228,11,239,228
 journal-of-economic-behavior-and-organization,Journal of Economic Behavior and Organization,2014,14,224,219,5,224,219
@@ -286,6 +326,8 @@ journal-of-economic-behavior-and-organization,Journal of Economic Behavior and O
 journal-of-economic-behavior-and-organization,Journal of Economic Behavior and Organization,2023,12,395,376,19,395,376
 journal-of-economic-behavior-and-organization,Journal of Economic Behavior and Organization,2024,12,410,391,19,410,391
 journal-of-economic-behavior-and-organization,Journal of Economic Behavior and Organization,2025,12,432,412,20,432,412
+journal-of-economic-dynamics-and-control,Journal of Economic Dynamics and Control,2010,12,159,155,4,159,159
+journal-of-economic-dynamics-and-control,Journal of Economic Dynamics and Control,2011,12,138,131,7,138,138
 journal-of-economic-dynamics-and-control,Journal of Economic Dynamics and Control,2012,12,114,112,2,114,112
 journal-of-economic-dynamics-and-control,Journal of Economic Dynamics and Control,2013,12,167,163,4,167,163
 journal-of-economic-dynamics-and-control,Journal of Economic Dynamics and Control,2014,12,207,200,7,207,200
@@ -300,6 +342,8 @@ journal-of-economic-dynamics-and-control,Journal of Economic Dynamics and Contro
 journal-of-economic-dynamics-and-control,Journal of Economic Dynamics and Control,2023,12,134,121,13,134,121
 journal-of-economic-dynamics-and-control,Journal of Economic Dynamics and Control,2024,12,128,115,13,128,115
 journal-of-economic-dynamics-and-control,Journal of Economic Dynamics and Control,2025,12,144,131,13,144,131
+journal-of-economic-growth,Journal of Economic Growth,2010,4,12,12,0,12,12
+journal-of-economic-growth,Journal of Economic Growth,2011,4,12,12,0,12,12
 journal-of-economic-growth,Journal of Economic Growth,2012,4,12,12,0,12,12
 journal-of-economic-growth,Journal of Economic Growth,2013,4,12,12,0,12,12
 journal-of-economic-growth,Journal of Economic Growth,2014,4,13,13,0,13,13
@@ -314,6 +358,8 @@ journal-of-economic-growth,Journal of Economic Growth,2022,4,14,14,0,14,14
 journal-of-economic-growth,Journal of Economic Growth,2023,4,16,14,2,16,16
 journal-of-economic-growth,Journal of Economic Growth,2024,4,14,14,0,14,14
 journal-of-economic-growth,Journal of Economic Growth,2025,4,13,13,0,13,13
+journal-of-economic-literature,Journal of Economic Literature,2010,4,38,19,19,38,21
+journal-of-economic-literature,Journal of Economic Literature,2011,4,38,21,17,38,22
 journal-of-economic-literature,Journal of Economic Literature,2012,4,41,25,16,41,25
 journal-of-economic-literature,Journal of Economic Literature,2013,4,41,25,16,41,25
 journal-of-economic-literature,Journal of Economic Literature,2014,4,37,21,16,37,21
@@ -328,6 +374,8 @@ journal-of-economic-literature,Journal of Economic Literature,2022,4,48,29,19,48
 journal-of-economic-literature,Journal of Economic Literature,2023,4,63,48,15,63,48
 journal-of-economic-literature,Journal of Economic Literature,2024,4,76,63,13,76,63
 journal-of-economic-literature,Journal of Economic Literature,2025,4,70,57,13,70,57
+journal-of-economic-perspectives,Journal of Economic Perspectives,2010,4,62,48,14,62,53
+journal-of-economic-perspectives,Journal of Economic Perspectives,2011,4,56,42,14,56,46
 journal-of-economic-perspectives,Journal of Economic Perspectives,2012,4,54,42,12,54,46
 journal-of-economic-perspectives,Journal of Economic Perspectives,2013,4,57,44,13,57,48
 journal-of-economic-perspectives,Journal of Economic Perspectives,2014,4,56,46,10,56,50
@@ -342,6 +390,8 @@ journal-of-economic-perspectives,Journal of Economic Perspectives,2022,4,48,40,8
 journal-of-economic-perspectives,Journal of Economic Perspectives,2023,4,49,41,8,49,45
 journal-of-economic-perspectives,Journal of Economic Perspectives,2024,4,49,41,8,49,45
 journal-of-economic-perspectives,Journal of Economic Perspectives,2025,4,51,43,8,51,47
+journal-of-economic-theory,Journal of Economic Theory,2010,6,119,108,11,119,112
+journal-of-economic-theory,Journal of Economic Theory,2011,6,120,107,13,120,114
 journal-of-economic-theory,Journal of Economic Theory,2012,6,115,101,14,115,101
 journal-of-economic-theory,Journal of Economic Theory,2013,6,118,109,9,118,109
 journal-of-economic-theory,Journal of Economic Theory,2014,6,137,126,11,137,126
@@ -356,6 +406,8 @@ journal-of-economic-theory,Journal of Economic Theory,2022,8,163,145,18,163,145
 journal-of-economic-theory,Journal of Economic Theory,2023,8,140,128,12,140,128
 journal-of-economic-theory,Journal of Economic Theory,2024,8,122,113,9,122,113
 journal-of-economic-theory,Journal of Economic Theory,2025,8,114,104,10,114,104
+journal-of-environmental-economics-and-management,Journal of Environmental Economics and Management,2010,6,46,40,6,46,40
+journal-of-environmental-economics-and-management,Journal of Environmental Economics and Management,2011,6,64,57,7,64,58
 journal-of-environmental-economics-and-management,Journal of Environmental Economics and Management,2012,6,65,58,7,65,58
 journal-of-environmental-economics-and-management,Journal of Environmental Economics and Management,2013,6,76,69,7,76,69
 journal-of-environmental-economics-and-management,Journal of Environmental Economics and Management,2014,6,60,53,7,60,53
@@ -370,6 +422,8 @@ journal-of-environmental-economics-and-management,Journal of Environmental Econo
 journal-of-environmental-economics-and-management,Journal of Environmental Economics and Management,2023,6,116,108,8,116,108
 journal-of-environmental-economics-and-management,Journal of Environmental Economics and Management,2024,6,136,129,7,136,129
 journal-of-environmental-economics-and-management,Journal of Environmental Economics and Management,2025,6,125,118,7,125,118
+journal-of-financial-econometrics,Journal of Financial Econometrics,2010,4,33,19,14,33,30
+journal-of-financial-econometrics,Journal of Financial Econometrics,2011,4,22,21,1,22,22
 journal-of-financial-econometrics,Journal of Financial Econometrics,2012,4,23,22,1,23,22
 journal-of-financial-econometrics,Journal of Financial Econometrics,2013,4,21,21,0,21,21
 journal-of-financial-econometrics,Journal of Financial Econometrics,2014,4,26,22,4,26,22
@@ -384,6 +438,8 @@ journal-of-financial-econometrics,Journal of Financial Econometrics,2022,5,32,32
 journal-of-financial-econometrics,Journal of Financial Econometrics,2023,5,56,50,6,56,50
 journal-of-financial-econometrics,Journal of Financial Econometrics,2024,5,54,54,0,54,54
 journal-of-financial-econometrics,Journal of Financial Econometrics,2025,5,51,43,8,51,43
+journal-of-health-economics,Journal of Health Economics,2010,6,82,72,10,82,75
+journal-of-health-economics,Journal of Health Economics,2011,6,112,102,10,112,105
 journal-of-health-economics,Journal of Health Economics,2012,6,77,67,10,77,67
 journal-of-health-economics,Journal of Health Economics,2013,6,119,105,14,119,108
 journal-of-health-economics,Journal of Health Economics,2014,6,89,79,10,89,82
@@ -398,6 +454,8 @@ journal-of-health-economics,Journal of Health Economics,2022,6,94,88,6,94,88
 journal-of-health-economics,Journal of Health Economics,2023,6,91,85,6,91,85
 journal-of-health-economics,Journal of Health Economics,2024,6,75,68,7,75,68
 journal-of-health-economics,Journal of Health Economics,2025,6,102,91,11,102,91
+journal-of-human-resources,Journal of Human Resources,2010,4,34,34,0,34,34
+journal-of-human-resources,Journal of Human Resources,2011,4,32,32,0,32,32
 journal-of-human-resources,Journal of Human Resources,2012,4,36,36,0,36,36
 journal-of-human-resources,Journal of Human Resources,2013,4,33,33,0,33,33
 journal-of-human-resources,Journal of Human Resources,2014,4,33,32,1,33,32
@@ -412,6 +470,8 @@ journal-of-human-resources,Journal of Human Resources,2022,6,61,60,1,61,60
 journal-of-human-resources,Journal of Human Resources,2023,6,61,60,1,61,60
 journal-of-human-resources,Journal of Human Resources,2024,6,61,60,1,61,60
 journal-of-human-resources,Journal of Human Resources,2025,6,62,60,2,62,61
+journal-of-international-economics,Journal of International Economics,2010,6,71,66,5,71,70
+journal-of-international-economics,Journal of International Economics,2011,6,72,62,10,72,71
 journal-of-international-economics,Journal of International Economics,2012,6,96,87,9,96,96
 journal-of-international-economics,Journal of International Economics,2013,6,105,98,7,105,103
 journal-of-international-economics,Journal of International Economics,2014,7,84,79,5,84,83
@@ -426,6 +486,8 @@ journal-of-international-economics,Journal of International Economics,2022,6,101
 journal-of-international-economics,Journal of International Economics,2023,7,108,100,8,108,100
 journal-of-international-economics,Journal of International Economics,2024,6,129,118,11,129,118
 journal-of-international-economics,Journal of International Economics,2025,6,124,117,7,124,117
+journal-of-labor-economics,Journal of Labor Economics,2010,4,30,25,5,30,26
+journal-of-labor-economics,Journal of Labor Economics,2011,4,26,23,3,26,23
 journal-of-labor-economics,Journal of Labor Economics,2012,4,29,24,5,29,25
 journal-of-labor-economics,Journal of Labor Economics,2013,5,34,30,4,34,31
 journal-of-labor-economics,Journal of Labor Economics,2014,4,33,26,7,33,26
@@ -440,6 +502,8 @@ journal-of-labor-economics,Journal of Labor Economics,2022,5,52,40,12,52,40
 journal-of-labor-economics,Journal of Labor Economics,2023,5,50,41,9,50,41
 journal-of-labor-economics,Journal of Labor Economics,2024,5,56,44,12,56,44
 journal-of-labor-economics,Journal of Labor Economics,2025,5,54,47,7,54,47
+journal-of-law-and-economics,Journal of Law and Economics,2010,4,32,32,0,32,32
+journal-of-law-and-economics,Journal of Law and Economics,2011,5,52,51,1,52,52
 journal-of-law-and-economics,Journal of Law and Economics,2012,4,32,32,0,32,32
 journal-of-law-and-economics,Journal of Law and Economics,2013,4,33,30,3,33,32
 journal-of-law-and-economics,Journal of Law and Economics,2014,5,43,42,1,43,42
@@ -454,6 +518,8 @@ journal-of-law-and-economics,Journal of Law and Economics,2022,6,54,46,8,54,46
 journal-of-law-and-economics,Journal of Law and Economics,2023,4,32,28,4,32,28
 journal-of-law-and-economics,Journal of Law and Economics,2024,4,31,27,4,31,27
 journal-of-law-and-economics,Journal of Law and Economics,2025,4,32,28,4,32,28
+journal-of-monetary-economics,Journal of Monetary Economics,2010,8,94,71,23,94,83
+journal-of-monetary-economics,Journal of Monetary Economics,2011,6,60,43,17,60,53
 journal-of-monetary-economics,Journal of Monetary Economics,2012,9,78,54,24,78,65
 journal-of-monetary-economics,Journal of Monetary Economics,2013,8,77,57,20,77,69
 journal-of-monetary-economics,Journal of Monetary Economics,2014,9,97,72,25,97,84
@@ -468,6 +534,8 @@ journal-of-monetary-economics,Journal of Monetary Economics,2022,9,92,70,22,92,7
 journal-of-monetary-economics,Journal of Monetary Economics,2023,9,87,67,20,87,67
 journal-of-monetary-economics,Journal of Monetary Economics,2024,11,122,95,27,122,95
 journal-of-monetary-economics,Journal of Monetary Economics,2025,9,105,88,17,105,88
+journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2010,8,87,79,8,87,86
+journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2011,9,105,89,16,104,102
 journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2012,9,93,82,11,93,91
 journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2013,9,83,81,2,83,83
 journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2014,9,92,82,10,92,91
@@ -482,6 +550,8 @@ journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2022,
 journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2023,7,85,71,14,85,71
 journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2024,7,87,73,14,87,73
 journal-of-money-credit-and-banking,"Journal of Money, Credit and Banking",2025,7,83,69,14,83,69
+journal-of-political-economy,Journal of Political Economy,2010,6,40,30,10,40,32
+journal-of-political-economy,Journal of Political Economy,2011,6,44,30,14,44,36
 journal-of-political-economy,Journal of Political Economy,2012,6,43,30,13,43,35
 journal-of-political-economy,Journal of Political Economy,2013,6,45,29,16,45,32
 journal-of-political-economy,Journal of Political Economy,2014,6,46,30,16,46,32
@@ -496,6 +566,8 @@ journal-of-political-economy,Journal of Political Economy,2022,12,123,70,53,123,
 journal-of-political-economy,Journal of Political Economy,2023,12,124,79,45,124,79
 journal-of-political-economy,Journal of Political Economy,2024,12,131,92,39,131,92
 journal-of-political-economy,Journal of Political Economy,2025,12,131,90,41,131,90
+journal-of-public-economics,Journal of Public Economics,2010,6,100,94,6,100,94
+journal-of-public-economics,Journal of Public Economics,2011,6,148,136,12,148,142
 journal-of-public-economics,Journal of Public Economics,2012,6,101,92,9,101,94
 journal-of-public-economics,Journal of Public Economics,2013,12,120,106,14,120,108
 journal-of-public-economics,Journal of Public Economics,2014,12,150,136,14,150,136
@@ -510,6 +582,8 @@ journal-of-public-economics,Journal of Public Economics,2022,12,142,130,12,142,1
 journal-of-public-economics,Journal of Public Economics,2023,12,181,169,12,181,169
 journal-of-public-economics,Journal of Public Economics,2024,12,165,153,12,165,153
 journal-of-public-economics,Journal of Public Economics,2025,12,185,169,16,185,169
+journal-of-risk-and-uncertainty,Journal of Risk and Uncertainty,2010,6,25,24,1,25,25
+journal-of-risk-and-uncertainty,Journal of Risk and Uncertainty,2011,6,24,24,0,24,24
 journal-of-risk-and-uncertainty,Journal of Risk and Uncertainty,2012,6,24,24,0,24,24
 journal-of-risk-and-uncertainty,Journal of Risk and Uncertainty,2013,6,25,24,1,25,25
 journal-of-risk-and-uncertainty,Journal of Risk and Uncertainty,2014,6,24,23,1,24,24
@@ -524,6 +598,8 @@ journal-of-risk-and-uncertainty,Journal of Risk and Uncertainty,2022,6,24,24,0,2
 journal-of-risk-and-uncertainty,Journal of Risk and Uncertainty,2023,6,25,24,1,25,25
 journal-of-risk-and-uncertainty,Journal of Risk and Uncertainty,2024,6,24,24,0,24,24
 journal-of-risk-and-uncertainty,Journal of Risk and Uncertainty,2025,6,28,26,2,28,28
+journal-of-the-european-economic-association,Journal of the European Economic Association,2010,5,66,63,3,66,64
+journal-of-the-european-economic-association,Journal of the European Economic Association,2011,6,43,39,4,43,43
 journal-of-the-european-economic-association,Journal of the European Economic Association,2012,6,51,48,3,51,51
 journal-of-the-european-economic-association,Journal of the European Economic Association,2013,7,62,60,2,62,61
 journal-of-the-european-economic-association,Journal of the European Economic Association,2014,6,57,55,2,57,55
@@ -538,6 +614,8 @@ journal-of-the-european-economic-association,Journal of the European Economic As
 journal-of-the-european-economic-association,Journal of the European Economic Association,2023,6,67,67,0,67,67
 journal-of-the-european-economic-association,Journal of the European Economic Association,2024,6,72,68,4,72,68
 journal-of-the-european-economic-association,Journal of the European Economic Association,2025,6,61,60,1,61,60
+journal-of-urban-economics,Journal of Urban Economics,2010,6,62,55,7,62,55
+journal-of-urban-economics,Journal of Urban Economics,2011,5,40,34,6,40,35
 journal-of-urban-economics,Journal of Urban Economics,2012,5,54,46,8,54,48
 journal-of-urban-economics,Journal of Urban Economics,2013,6,52,46,6,52,46
 journal-of-urban-economics,Journal of Urban Economics,2014,6,61,53,8,61,55
@@ -552,6 +630,8 @@ journal-of-urban-economics,Journal of Urban Economics,2022,6,68,55,13,68,55
 journal-of-urban-economics,Journal of Urban Economics,2023,6,67,58,9,67,58
 journal-of-urban-economics,Journal of Urban Economics,2024,6,72,64,8,72,64
 journal-of-urban-economics,Journal of Urban Economics,2025,6,57,50,7,57,50
+quantitative-economics,Quantitative Economics,2010,2,15,11,4,13,11
+quantitative-economics,Quantitative Economics,2011,3,19,13,6,12,13
 quantitative-economics,Quantitative Economics,2012,3,20,14,6,20,14
 quantitative-economics,Quantitative Economics,2013,3,22,16,6,22,16
 quantitative-economics,Quantitative Economics,2014,3,27,21,6,27,21
@@ -566,6 +646,8 @@ quantitative-economics,Quantitative Economics,2022,4,58,49,9,58,49
 quantitative-economics,Quantitative Economics,2023,4,47,39,8,47,39
 quantitative-economics,Quantitative Economics,2024,4,41,33,8,41,33
 quantitative-economics,Quantitative Economics,2025,4,44,36,8,44,36
+quarterly-journal-of-economics,Quarterly Journal of Economics,2010,4,44,44,0,44,44
+quarterly-journal-of-economics,Quarterly Journal of Economics,2011,4,47,45,2,47,46
 quarterly-journal-of-economics,Quarterly Journal of Economics,2012,4,41,41,0,41,41
 quarterly-journal-of-economics,Quarterly Journal of Economics,2013,4,56,39,17,56,39
 quarterly-journal-of-economics,Quarterly Journal of Economics,2014,4,56,40,16,56,40
@@ -580,6 +662,8 @@ quarterly-journal-of-economics,Quarterly Journal of Economics,2022,4,49,48,1,49,
 quarterly-journal-of-economics,Quarterly Journal of Economics,2023,4,49,48,1,49,48
 quarterly-journal-of-economics,Quarterly Journal of Economics,2024,4,49,48,1,49,48
 quarterly-journal-of-economics,Quarterly Journal of Economics,2025,4,61,60,1,61,60
+rand-journal-of-economics,RAND Journal of Economics,2010,4,34,34,0,34,34
+rand-journal-of-economics,RAND Journal of Economics,2011,4,32,32,0,32,32
 rand-journal-of-economics,RAND Journal of Economics,2012,4,32,32,0,32,32
 rand-journal-of-economics,RAND Journal of Economics,2013,4,32,32,0,32,32
 rand-journal-of-economics,RAND Journal of Economics,2014,4,35,35,0,35,35
@@ -594,6 +678,8 @@ rand-journal-of-economics,RAND Journal of Economics,2022,4,31,27,4,31,27
 rand-journal-of-economics,RAND Journal of Economics,2023,4,27,23,4,27,23
 rand-journal-of-economics,RAND Journal of Economics,2024,4,32,28,4,32,28
 rand-journal-of-economics,RAND Journal of Economics,2025,4,41,37,4,41,37
+review-of-economic-dynamics,Review of Economic Dynamics,2010,4,47,43,4,47,43
+review-of-economic-dynamics,Review of Economic Dynamics,2011,4,45,40,5,45,41
 review-of-economic-dynamics,Review of Economic Dynamics,2012,4,35,31,4,35,31
 review-of-economic-dynamics,Review of Economic Dynamics,2013,4,47,42,5,47,43
 review-of-economic-dynamics,Review of Economic Dynamics,2014,4,48,44,4,48,44
@@ -608,6 +694,8 @@ review-of-economic-dynamics,Review of Economic Dynamics,2022,4,60,56,4,60,56
 review-of-economic-dynamics,Review of Economic Dynamics,2023,5,107,101,6,107,101
 review-of-economic-dynamics,Review of Economic Dynamics,2024,3,26,21,5,26,21
 review-of-economic-dynamics,Review of Economic Dynamics,2025,4,41,36,5,41,36
+review-of-economic-studies,Review of Economic Studies,2010,4,52,50,2,52,51
+review-of-economic-studies,Review of Economic Studies,2011,4,50,50,0,50,50
 review-of-economic-studies,Review of Economic Studies,2012,4,52,52,0,52,52
 review-of-economic-studies,Review of Economic Studies,2013,4,53,52,1,53,52
 review-of-economic-studies,Review of Economic Studies,2014,4,52,52,0,52,52
@@ -622,6 +710,8 @@ review-of-economic-studies,Review of Economic Studies,2022,6,93,90,3,93,90
 review-of-economic-studies,Review of Economic Studies,2023,6,97,92,5,97,92
 review-of-economic-studies,Review of Economic Studies,2024,6,108,99,9,108,99
 review-of-economic-studies,Review of Economic Studies,2025,6,117,116,1,117,116
+review-of-economics-and-statistics,Review of Economics and Statistics,2010,4,78,78,0,0,78
+review-of-economics-and-statistics,Review of Economics and Statistics,2011,4,101,101,0,0,101
 review-of-economics-and-statistics,Review of Economics and Statistics,2012,4,80,80,0,80,80
 review-of-economics-and-statistics,Review of Economics and Statistics,2013,5,119,119,0,119,119
 review-of-economics-and-statistics,Review of Economics and Statistics,2014,5,72,71,1,72,71
@@ -636,6 +726,8 @@ review-of-economics-and-statistics,Review of Economics and Statistics,2022,6,92,
 review-of-economics-and-statistics,Review of Economics and Statistics,2023,6,108,107,1,108,107
 review-of-economics-and-statistics,Review of Economics and Statistics,2024,6,114,113,1,114,113
 review-of-economics-and-statistics,Review of Economics and Statistics,2025,6,122,120,2,122,120
+the-economic-journal,The Economic Journal,2010,8,89,78,11,89,85
+the-economic-journal,The Economic Journal,2011,8,79,73,6,79,79
 the-economic-journal,The Economic Journal,2012,8,74,66,8,74,74
 the-economic-journal,The Economic Journal,2013,8,76,69,7,76,76
 the-economic-journal,The Economic Journal,2014,8,79,75,4,79,79
@@ -650,6 +742,8 @@ the-economic-journal,The Economic Journal,2022,8,107,106,1,107,106
 the-economic-journal,The Economic Journal,2023,8,109,107,2,109,107
 the-economic-journal,The Economic Journal,2024,8,119,117,2,119,117
 the-economic-journal,The Economic Journal,2025,8,99,91,8,99,91
+the-journal-of-economic-history,The Journal of Economic History,2010,4,80,31,49,80,72
+the-journal-of-economic-history,The Journal of Economic History,2011,4,80,33,47,80,72
 the-journal-of-economic-history,The Journal of Economic History,2012,4,80,31,49,80,74
 the-journal-of-economic-history,The Journal of Economic History,2013,4,80,31,49,80,74
 the-journal-of-economic-history,The Journal of Economic History,2014,4,80,33,47,80,74
@@ -664,6 +758,8 @@ the-journal-of-economic-history,The Journal of Economic History,2022,4,52,30,22,
 the-journal-of-economic-history,The Journal of Economic History,2023,4,55,31,24,55,42
 the-journal-of-economic-history,The Journal of Economic History,2024,4,54,31,23,54,41
 the-journal-of-economic-history,The Journal of Economic History,2025,4,60,31,29,60,47
+theoretical-economics,Theoretical Economics,2010,3,15,15,0,15,15
+theoretical-economics,Theoretical Economics,2011,3,24,18,6,24,18
 theoretical-economics,Theoretical Economics,2012,3,26,20,6,26,20
 theoretical-economics,Theoretical Economics,2013,3,36,30,6,36,30
 theoretical-economics,Theoretical Economics,2014,3,34,28,6,34,28
