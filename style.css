@@ -300,15 +300,46 @@ li.item.target:focus-visible { outline: 3px solid var(--accent); outline-offset:
 .picks-row .field { flex: 1 1 100%; }
 .jlist { display: flex; flex-direction: column; gap: 8px; }
 .jrow {
-  display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.3fr) auto; gap: 4px 16px; align-items: baseline;
+  display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.2fr) auto auto; gap: 4px 16px; align-items: center;
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 10px 14px; text-decoration: none; color: inherit; box-shadow: var(--shadow);
 }
 .jrow:hover { border-color: var(--accent); }
 .jrow .jname { font-weight: 650; color: var(--accent); }
 .jrow .jmeta, .jrow .jnums { font-family: var(--sans); font-size: 13.5px; color: var(--muted); }
-.jrow .jnums { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: flex-end; }
+.jrow .jnums { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: flex-end; align-items: center; }
 .jrow .jnums strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+a.jbrowse {
+  justify-self: end; font-family: var(--sans); font-weight: 700; font-size: 14px;
+  min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--chip); text-decoration: none; white-space: nowrap;
+}
+a.jbrowse:hover { border-color: var(--accent); }
+h1.page-title a { color: inherit; }
+.page-actions { margin: 4px 0 18px; }
+a.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  text-decoration: none; min-height: 44px;
+}
+.sortbar {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px; box-shadow: var(--shadow); margin: 8px 0 12px;
+}
+.sortbar-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sortbar-row select { flex: 1 1 auto; width: 12rem; min-width: 0; max-width: 100%; min-height: 44px; height: 44px; }
+.sortbar-row .btn { min-height: 44px; }
+table.sortable thead th { padding: 0; }
+table.sortable thead th .sort {
+  display: block; width: 100%; box-sizing: border-box;
+  font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--muted); background: transparent; border: 0;
+  cursor: pointer; text-align: left; padding: 12px;
+}
+table.sortable thead th.num .sort { text-align: right; }
+table.sortable thead th .sort[aria-pressed="true"] { color: var(--accent); }
+table.sortable thead th[aria-sort="ascending"] .sort::after { content: " \25B2"; }
+table.sortable thead th[aria-sort="descending"] .sort::after { content: " \25BC"; }
+table.responsive .jname, .intro, .crumbs { overflow-wrap: anywhere; }
 .site-search {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 14px; box-shadow: var(--shadow); margin: 8px 0 18px;
@@ -352,23 +383,33 @@ li.item.target:focus-visible { outline: 3px solid var(--accent); outline-offset:
   .journal-field { max-width: none; }
   .jrow { grid-template-columns: 1fr; gap: 2px; }
   .jrow .jnums { justify-content: flex-start; }
+  a.jbrowse { justify-self: stretch; }
 }
 @media (max-width: 720px) {
   .wrap { padding: 0 14px; }
   .bar { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 12px; padding-bottom: 12px; }
-  .nav { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; }
+  .nav { flex-wrap: wrap; overflow-x: visible; max-width: 100%; }
+  .nav a { padding-left: 10px; padding-right: 10px; }
   h1.page-title { font-size: 24px; }
   .controls .row, .site-search-row { flex-direction: column; align-items: stretch; }
   .site-search-row input[type="search"] { flex: 1 1 auto; width: 100%; }
   .field.grow, .journal-field { flex: 1 1 auto; }
   .row, .controls, .site-search { min-width: 0; max-width: 100%; }
-  .site-search-row .btn, .controls .btn { width: 100%; }
+  .site-search-row .btn, .controls .btn, .page-actions .btn, .sortbar-row .btn { width: 100%; }
+  .sortbar-row { flex-direction: column; align-items: stretch; }
+  .sortbar-row select { width: 100%; }
   input[type="search"], input[type="text"] { padding: 12px 10px; }
   fieldset.chips legend { float: none; display: block; width: 100%; margin: 0 0 6px; }
   .picks { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 6px; }
-  .picks .chip, .chip, .btn, .copy-doi, .cite-btn, .copy-cite, .issue-step, .nav a, .issue-links a, a.author-name {
+  .picks .chip, .chip, .btn, .copy-doi, .cite-btn, .copy-cite, .issue-step, .nav a, .issue-links a, a.author-name, a.jname, a.jbrowse, .item .where a, .crumbs a, h1.page-title a {
     min-height: 44px;
   }
+  .tbl-wrap { overflow-x: clip; }
+  table.responsive, table.responsive caption, table.responsive tbody { display: block; width: 100%; max-width: 100%; }
+  table.responsive a.jname, h1.page-title a, .crumbs a, .item .where a {
+    display: inline-flex; align-items: center; box-sizing: border-box; max-width: 100%;
+  }
+  table.responsive a.jname { padding: 8px 0; }
   a.author-name {
     display: inline-block;
     box-sizing: border-box;
@@ -383,7 +424,7 @@ li.item.target:focus-visible { outline: 3px solid var(--accent); outline-offset:
   .copy-doi, .cite-btn, .copy-cite { padding: 8px 14px; }
   .cite-field-head { align-items: stretch; }
   .copy-cite { flex: 1 1 160px; }
-  .nav a, .issue-links a, .picks .chip {
+  .nav a, .issue-links a, .picks .chip, a.jbrowse {
     display: inline-flex; align-items: center; justify-content: center;
   }
   .issue-links a { min-width: 44px; padding: 8px 12px; }
@@ -404,7 +445,7 @@ li.item.target:focus-visible { outline: 3px solid var(--accent); outline-offset:
   table.responsive td:first-child { font-size: 16.5px; padding-top: 4px; padding-bottom: 4px; }
   table.responsive td[data-label]::before {
     content: attr(data-label);
-    float: left; min-width: 8.2em; margin-right: 8px;
+    display: block; float: none; min-width: 0; margin: 0 0 1px;
     color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
   }
   table.responsive td:first-child::before { content: none; }
