@@ -59,9 +59,12 @@ built 2026-11-14 14:13 (Asia/Hong_Kong). It adds 2010–2011 and supersedes the 
 scripts/build_site.py   reads the freeze, verifies it against summary.json, writes site/
 src/style.css           site stylesheet
 src/catalog.js          browse UI and site-wide search
+src/journals.js         sort the journals index
 site/                   generated; this is what GitHub Pages serves
   index.html            hub: search, counts, 49-journal table, About
   catalog.html          search and browse (?journal=&year=&volume=&issue=&type=&q=&item=)
+  journals/index.html   all 49 journals, sortable
+  journals/<slug>.html  one page per journal: counts, coverage, issues
   data/journals.json    small index (meta + per-journal coverage)
   data/journals/<slug>.json   one lean shard per journal, loaded on demand
   data/search/research.json   titles and display names for research articles
@@ -75,6 +78,9 @@ Catalog URLs:
 
 - The homepage search box submits to `catalog.html?q=…`. The same box is on the catalog page, and the query stays in the URL.
 - `catalog.html?q=Duflo` searches titles and author names in all 49 journals (research articles unless `type=other` or `type=all`). No journal has to be selected first.
+- `journals/index.html` lists all 49 journals and sorts by name, publisher, years, journal-years, issues, items, research, other, items with a DOI, items with names, and research articles with names. Those counts come from `journals.csv`, `coverage.csv`, and `authors_missing_by_journal_year.csv`.
+- `journals/<slug>.html` is one journal: display name, publisher, ISSN, years covered (AER: Insights starts in 2019; the others run 2010–2025), issue and item counts, items with a DOI, items and research articles with names, a year-by-year coverage table, and the issues in the freeze. A year or issue opens `catalog.html?journal=&year=&volume=&issue=`.
+- A journal name on the homepage, the journals index, and the catalog list opens that journal page. Browse in the catalog, and the year and issue links on the journal page, still open the catalog viewer.
 - `catalog.html?journal=aer`, `catalog.html?journal=aer&year=2018`, `catalog.html?journal=aer&year=2018&volume=108&issue=1` browse as before.
 - `catalog.html?journal=aer&q=wage` still searches only inside the loaded journal.
 - `catalog.html?journal=aej-applied-economics&year=2015&volume=7&issue=1&item=2` opens that issue and highlights the item. `item` is the 0-based position in the issue’s TOC order, not a public identifier.
@@ -94,7 +100,7 @@ python3 -m http.server 8000 -d site     # then open http://localhost:8000/
 The build fails if the freeze totals disagree with `summary.json`, if the search index does not match those totals, or if a person_id, conflict, or QS
 file or column would appear in `site/`. All asset paths are relative, so the same files work at the
 project-pages URL and on localhost. Data is fetched with `fetch()`, so open the site over HTTP, not `file://`.
-On a narrow screen the catalog keeps the search box, journal finder, and year and issue chips in reach. Previous and Next are full-width tap targets, each item keeps Copy DOI beside Cite, and each author name is at least 44px tall.
+On a narrow screen the catalog keeps the search box, journal finder, and year and issue chips in reach. Previous and Next are full-width tap targets, each item keeps Copy DOI beside Cite, and each author name is at least 44px tall. The journals index sorts from a control that stays on screen at about 390px wide, and the journal tables stack instead of scrolling the page sideways.
 
 ## Publishing
 
